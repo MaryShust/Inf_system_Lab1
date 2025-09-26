@@ -1,0 +1,101 @@
+header {
+    background-color: lightblue;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-link {
+    text-decoration: none;
+    color: red;
+    font-size: 24px;
+}
+
+#persons-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sort-indicator {
+    margin-left: 5px;
+    font-size: 0.8em;
+}
+
+.asc::after {
+    content: " ▲";
+}
+
+.desc::after {
+    content: " ▼";
+}
+
+.search-container {
+    margin-bottom: 25px;
+    margin-left: 0px;
+}
+
+.find-container {
+    margin-bottom: 25px;
+    margin-left: 0px;
+}
+
+.tabs-container {
+    margin: 10px 0;
+    margin-left: 0px;
+    padding: 0 0px;
+}
+
+.tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Горизонтальное расположение */
+    flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+    gap: 10px; /* Расстояние между табами */
+}
+
+.tab {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tab:hover {
+    background-color: #e0e0e0;
+}
+
+.tab.active {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.tab-content {
+    padding: 20px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.navigation-container {
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 15px;
+}
