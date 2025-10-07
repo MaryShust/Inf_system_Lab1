@@ -34,6 +34,14 @@ function openEditModal(personId) {
         .then(response => {
             if (response.ok) {
                 return response.json().then(person => {
+                    const locationSelect = document.getElementById('edit_location_select');
+                    const coordinateSelect = document.getElementById('edit_coordinate_select');
+                    const xInputL = document.getElementById('edit_location_x_input');
+                    const yInputL = document.getElementById('edit_location_y_input');
+                    const zInputL = document.getElementById('edit_location_z_input');
+                    const xInputC = document.getElementById('edit_coordinate_x_input');
+                    const yInputC = document.getElementById('edit_coordinate_y_input');
+
                     document.getElementById('edit_name_input').value = person.name || '';
                     document.getElementById('edit_birthday_input').value = person.birthday || '';
                     document.getElementById('edit_nationality_input').value = countryMapping[person.nationality] || '';
@@ -43,21 +51,35 @@ function openEditModal(personId) {
 
                     // Координаты
                     if (person.coordinates) {
-                        document.getElementById('edit_coordinate_x_input').value = person.coordinates.x || '';
-                        document.getElementById('edit_coordinate_y_input').value = person.coordinates.y || '';
+                        xInputC.value = person.coordinates.x || '';
+                        yInputC.value = person.coordinates.y || '';
                     }
 
                     // Локация
                     if (person.location) {
-                        document.getElementById('edit_location_x_input').value = person.location.x || '';
-                        document.getElementById('edit_location_y_input').value = person.location.y || '';
-                        document.getElementById('edit_location_z_input').value = person.location.z || '';
+                        xInputL.value = person.location.x || '';
+                        yInputL.value = person.location.y || '';
+                        zInputL.value = person.location.z || '';
                     }
                     document.getElementById('edit_creation_date').textContent = person.creationDate || '';
 
 
-                    loadLocations(document.getElementById('edit_location_select'));
-                    loadCoordinates(document.getElementById('edit_coordinate_select'));
+                    loadLocations(locationSelect);
+                    loadCoordinates(coordinateSelect);
+
+                    locationSelect.addEventListener('change', () => {
+                        const [x, y, z] = locationSelect.value.split(',').map(Number);
+                        if (!isNaN(x)) xInputL.value = x;
+                        if (!isNaN(y)) yInputL.value = y;
+                        if (!isNaN(z)) zInputL.value = z;
+                    });
+
+                    // Обработчик выбора локации
+                    coordinateSelect.addEventListener('change', () => {
+                        const [x, y] = coordinateSelect.value.split(',').map(Number);
+                        if (!isNaN(x)) xInputC.value = x;
+                        if (!isNaN(y)) yInputC.value = y;
+                    });
                 });
             } else {
                 console.error('Ошибка загрузки данных:', error)

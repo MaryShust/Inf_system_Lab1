@@ -1,9 +1,11 @@
 package inf_system.Lab1.db.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
 @Table(name = "coordinates")
+@Getter
 public class Coordinates {
 
     @Id
@@ -17,27 +19,11 @@ public class Coordinates {
     @Column(name = "y")
     private int y;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getX() {
-        return x;
-    }
-
     public void setX(int x) {
         if (x > 674) {
             throw new IllegalArgumentException("X не может быть больше 674");
         }
         this.x = x;
-    }
-
-    public Integer getY() {
-        return y;
     }
 
     public void setY(int y) {
@@ -49,10 +35,12 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return "Coordinates{" +
-                "id=" + id +
-                ", x=" + x +
-                ", y=" + y +
-                '}';
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("Coordinates{");
+        sb.append("id=").append(id);
+        sb.append(", x=").append(x);
+        sb.append(", y=").append(y);
+        sb.append('}');
+        return sb.toString();
     }
 }

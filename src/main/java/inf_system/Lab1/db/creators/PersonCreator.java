@@ -7,9 +7,7 @@ import inf_system.Lab1.db.repositories.PersonRepository;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -23,7 +21,7 @@ public class PersonCreator {
     @Autowired
     private CoordinatesCreator coordinatesCreator;
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public Person createPerson(
             Long id,
             @NotNull String name,

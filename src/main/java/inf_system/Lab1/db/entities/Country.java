@@ -28,15 +28,4 @@ public enum Country {
         return Arrays.stream(Country.values())
                 .anyMatch(country -> country.getTranslation().equals(value));
     }
-
-    // Метод с игнорированием регистра (опционально)
-    public static boolean containsTranslationIgnoreCase(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return false;
-        }
-
-        String normalized = value.trim();
-        return Arrays.stream(Country.values())
-                .anyMatch(country -> country.getTranslation().equalsIgnoreCase(normalized));
-    }
 }

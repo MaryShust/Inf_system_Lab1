@@ -1,9 +1,13 @@
 package inf_system.Lab1.db.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "locations")
+@Getter
+@Setter
 public class Location {
 
     @Id
@@ -20,45 +24,15 @@ public class Location {
     @Column(name = "z")
     private double z;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public void setY(float y) {
-        this.y = y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
     @Override
     public String toString() {
-        return "Location{" +
-                "id=" + id +
-                ", x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("Location{");
+        sb.append("id=").append(id);
+        sb.append(", x=").append(x);
+        sb.append(", y=").append(y);
+        sb.append(", z=").append(z);
+        sb.append('}');
+        return sb.toString();
     }
 }

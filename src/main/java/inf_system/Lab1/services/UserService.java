@@ -5,7 +5,6 @@ import inf_system.Lab1.db.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 @Service
@@ -16,18 +15,23 @@ public class UserService {
 
     @Transactional
     public Long findOrCreateUser(String name, String password) {
-//        Optional<User> existingUser = userRepository.findByNameAndPassword(name, password);
-        Optional<User> existingUser = userRepository.findByNameAndPasswordWithLock(name, password);
-        Long userId;
+        // БЫСТРАЯ ПРОВЕРКА БЕЗ БЛОКИРОВКИ (для оптимизации)
+        Optional<User> existingUser = userRepository.findByNameAndPassword(name, password);
         if (existingUser.isPresent()) {
-            userId = existingUser.get().getId();
-        } else {
-            User newUser = new User();
-            newUser.setName(name);
-            newUser.setPassword(password);
-            User savedUser = userRepository.save(newUser);
-            userId = savedUser.getId();
+            return existingUser.get().getId(); // Быстрый путь - пользователь уже существует
         }
-        return userId;
+
+        existingUser = userRepository.findByNameAndPasswordWithLock(name, password);
+
+        // Double-check ПОД БЛОКИРОВКОЙ (на случай если между первой проверкой и блокировкой пользователь создался)
+        if (existingUser.isPresent()) {
+            return existingUser.get().getId();
+        }
+
+        User newUser = new User();
+        newUser.setName(name);
+        newUser.setPassword(password);
+        User savedUser = userRepository.save(newUser);
+        return savedUser.getId();
     }
 }

@@ -13,7 +13,7 @@ public class CoordinatesCreator {
     @Autowired
     private CoordinatesRepository coordinatesRepository;
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public Coordinates createCoordinates(int x, int y) {
         Coordinates result = coordinatesRepository.findByXAndYWithLock(x, y);
         if (result != null) {

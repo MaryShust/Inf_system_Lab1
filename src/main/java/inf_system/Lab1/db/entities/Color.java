@@ -28,15 +28,4 @@ public enum Color {
         return Arrays.stream(Color.values())
                 .anyMatch(color -> color.getTranslation().equals(value));
     }
-
-    // Метод с игнорированием регистра (опционально)
-    public static boolean containsTranslationIgnoreCase(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return false;
-        }
-
-        String normalized = value.trim();
-        return Arrays.stream(Color.values())
-                .anyMatch(color -> color.getTranslation().equalsIgnoreCase(normalized));
-    }
 }

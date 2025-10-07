@@ -1,14 +1,17 @@
 package inf_system.Lab1.db.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 
 @Entity
 @Table(name = "persons")
+@Getter
+@Setter
 public class Person {
 
     @Id
@@ -54,59 +57,11 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Country nationality;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public void setName(@NotNull String name) {
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Name не может быть пустым");
         }
         this.name = name;
-    }
-
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public void setCoordinates(@NotNull Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public Color getEyeColor() {
-        return eyeColor;
-    }
-
-    public void setEyeColor(Color eyeColor) {
-        this.eyeColor = eyeColor;
-    }
-
-    public Color getHairColor() {
-        return hairColor;
-    }
-
-    public void setHairColor(@NotNull Color hairColor) {
-        this.hairColor = hairColor;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public void setHeight(int height) {
@@ -116,46 +71,23 @@ public class Person {
         this.height = height;
     }
 
-    public LocalDateTime getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDateTime birthday) {
-        this.birthday = birthday;
-    }
-
-    public Country getNationality() {
-        return nationality;
-    }
-
-    public void setNationality(@NotNull Country nationality) {
-        this.nationality = nationality;
-    }
-
-    public LocalDate getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
-    }
-
     @Override
     public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", coordinates=" + coordinates +
-                ", creationDate=" + creationDate +
-                ", eyeColor=" + eyeColor +
-                ", hairColor=" + hairColor +
-                ", location=" + location +
-                ", height=" + height +
-                ", birthday=" + birthday +
-                ", nationality=" + nationality +
-                '}';
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("Person{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", coordinates=").append(coordinates);
+        sb.append(", creationDate=").append(creationDate);
+        sb.append(", eyeColor=").append(eyeColor);
+        sb.append(", hairColor=").append(hairColor);
+        sb.append(", location=").append(location);
+        sb.append(", height=").append(height);
+        sb.append(", birthday=").append(birthday);
+        sb.append(", nationality=").append(nationality);
+        sb.append('}');
+        return sb.toString();
     }
-
 
     public static Comparator<Person> getComparator(String sortField, String sortOrder) {
         Comparator<Person> comparator = (p1, p2) -> {
@@ -177,19 +109,19 @@ public class Person {
 
     public static Object getFieldValue(Person person, String field) {
         return switch (field.toLowerCase()) {
-            case "name" -> person.getName();
-            case "coordinates.x" -> person.getCoordinates().getX();
-            case "coordinates.y" -> person.getCoordinates().getY();
-            case "location.x" -> person.getLocation().getX();
-            case "location.y" -> person.getLocation().getY();
-            case "location.z" -> person.getLocation().getZ();
-            case "height" -> person.getHeight();
-            case "eyecolor" -> person.getEyeColor().getTranslation();
-            case "haircolor" -> person.getHairColor().getTranslation();
-            case "nationality" -> person.getNationality().getTranslation();
-            case "creationdate" -> person.getCreationDate();
-            case "birthday" -> person.getBirthday().toLocalDate();
-            default -> person.getId(); // По умолчанию сортировка по ID
+            case "name" -> person.name;
+            case "coordinates.x" -> person.coordinates.getX();
+            case "coordinates.y" -> person.coordinates.getY();
+            case "location.x" -> person.location.getX();
+            case "location.y" -> person.location.getY();
+            case "location.z" -> person.location.getZ();
+            case "height" -> person.height;
+            case "eyecolor" -> person.eyeColor.getTranslation();
+            case "haircolor" -> person.hairColor.getTranslation();
+            case "nationality" -> person.nationality.getTranslation();
+            case "creationdate" -> person.creationDate;
+            case "birthday" -> person.birthday.toLocalDate();
+            default -> person.id; // По умолчанию сортировка по ID
         };
     }
 }

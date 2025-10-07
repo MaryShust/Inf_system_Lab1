@@ -1,35 +1,16 @@
 package inf_system.Lab1.controller.dto;
 
 import inf_system.Lab1.db.entities.Location;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class LocationDTO {
+
     private Double x;
     private Float y;
     private Double z;
-
-    public Double getX() {
-        return x;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public Float getY() {
-        return y;
-    }
-
-    public void setY(Float y) {
-        this.y = y;
-    }
-
-    public Double getZ() {
-        return z;
-    }
-
-    public void setZ(Double z) {
-        this.z = z;
-    }
 
     public static LocationDTO map(Location location) {
         LocationDTO locationDTO = new LocationDTO();

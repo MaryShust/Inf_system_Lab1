@@ -13,7 +13,7 @@ public class LocationCreator {
     @Autowired
     private LocationRepository locationRepository;
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public Location createLocation(Double x, Float y, Double z) {
         if (x == null || y == null || z == null) {
             return null;
