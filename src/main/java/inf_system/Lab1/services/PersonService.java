@@ -109,13 +109,11 @@ public class PersonService {
         personRepository.deleteById(id);
 
         // Проверяем и удаляем Location, если больше не используется
-        // Атомарно удаляем если не используется
         if (locationId != null) {
             locationRepository.deleteIfUnused(locationId);
         }
 
         // Проверяем и удаляем Coordinates, если больше не используется
-        // Атомарно удаляем если не используется
         if (coordinatesId != null) {
             coordinatesRepository.deleteIfUnused(coordinatesId);
         }
@@ -124,13 +122,11 @@ public class PersonService {
     public List<PersonDTO> getPersons(int page, String sortField, String sortOrder, String search) {
         List<Person> persons = filterPersons(search);
 
-        // Сортировка
         Comparator<Person> comparator = getComparator(sortField, sortOrder);
         List<Person> sortedPersons = persons.stream()
                 .sorted(comparator)
                 .toList();
 
-        // Пагинация
         int pageSize = 10;
         int totalItems = sortedPersons.size();
         int fromIndex = Math.min((page - 1) * pageSize, totalItems);
@@ -160,21 +156,58 @@ public class PersonService {
                 .toList();
     }
 
-    private boolean matchesSearch(Person person, String searchText) {
-        Location location = person.getLocation();
-        Coordinates coordinates = person.getCoordinates();
+//    private boolean matchesSearch(Person person, String searchText) {
+//        Location location = person.getLocation();
+//        Coordinates coordinates = person.getCoordinates();
+//
+//        return person.getName().toLowerCase().contains(searchText) ||
+//        (coordinates != null && String.valueOf(coordinates.getX()).contains(searchText)) ||
+//        (coordinates != null && String.valueOf(coordinates.getY()).contains(searchText)) ||
+//        (location != null && String.valueOf(location.getX()).contains(searchText)) ||
+//        (location != null && String.valueOf(location.getY()).contains(searchText)) ||
+//        (location != null && String.valueOf(location.getZ()).contains(searchText)) ||
+//        String.valueOf(person.getHeight()).contains(searchText) ||
+//        (person.getEyeColor() != null && person.getEyeColor().getTranslation().contains(searchText)) ||
+//        (person.getHairColor() != null && person.getHairColor().getTranslation().contains(searchText)) ||
+//        (person.getNationality() != null && person.getNationality().getTranslation().contains(searchText)) ||
+//        person.getCreationDate().toString().contains(searchText) ||
+//        (person.getBirthday() != null && person.getBirthday().toLocalDate().toString().contains(searchText));
+//    }
 
-        return person.getName().toLowerCase().contains(searchText) ||
-        (coordinates != null && String.valueOf(coordinates.getX()).contains(searchText)) ||
-        (coordinates != null && String.valueOf(coordinates.getY()).contains(searchText)) ||
-        (location != null && String.valueOf(location.getX()).contains(searchText)) ||
-        (location != null && String.valueOf(location.getY()).contains(searchText)) ||
-        (location != null && String.valueOf(location.getZ()).contains(searchText)) ||
-        String.valueOf(person.getHeight()).contains(searchText) ||
-        (person.getEyeColor() != null && person.getEyeColor().getTranslation().contains(searchText)) ||
-        (person.getHairColor() != null && person.getHairColor().getTranslation().contains(searchText)) ||
-        (person.getNationality() != null && person.getNationality().getTranslation().contains(searchText)) ||
-        person.getCreationDate().toString().contains(searchText) ||
-                (person.getBirthday() != null && person.getBirthday().toLocalDate().toString().contains(searchText));
+    private boolean matchesSearch(Person person, String searchText) {
+        return matchesBasicFields(person, searchText)
+                || matchesCoordinates(person.getCoordinates(), searchText)
+                || matchesLocation(person.getLocation(), searchText)
+                || matchesColorFields(person, searchText)
+                || matchesDateFields(person, searchText);
+    }
+
+    private boolean matchesBasicFields(Person person, String searchText) {
+        return person.getName().toLowerCase().contains(searchText)
+                || String.valueOf(person.getHeight()).contains(searchText);
+    }
+
+    private boolean matchesCoordinates(Coordinates coordinates, String searchText) {
+        return coordinates != null
+                && (String.valueOf(coordinates.getX()).contains(searchText)
+                || String.valueOf(coordinates.getY()).contains(searchText));
+    }
+
+    private boolean matchesLocation(Location location, String searchText) {
+        return location != null
+                && (String.valueOf(location.getX()).contains(searchText)
+                || String.valueOf(location.getY()).contains(searchText)
+                || String.valueOf(location.getZ()).contains(searchText));
+    }
+
+    private boolean matchesColorFields(Person person, String searchText) {
+        return (person.getEyeColor() != null && person.getEyeColor().getTranslation().contains(searchText))
+                || (person.getHairColor() != null && person.getHairColor().getTranslation().contains(searchText))
+                || (person.getNationality() != null && person.getNationality().getTranslation().contains(searchText));
+    }
+
+    private boolean matchesDateFields(Person person, String searchText) {
+        return person.getCreationDate().toString().contains(searchText)
+                || (person.getBirthday() != null && person.getBirthday().toLocalDate().toString().contains(searchText));
     }
 }
