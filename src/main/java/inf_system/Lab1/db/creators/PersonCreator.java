@@ -1,15 +1,16 @@
 package inf_system.Lab1.db.creators;
 
+import inf_system.Lab1.controller.dto.PersonDTO;
 import inf_system.Lab1.db.entities.Color;
 import inf_system.Lab1.db.entities.Country;
 import inf_system.Lab1.db.entities.Person;
 import inf_system.Lab1.db.repositories.PersonRepository;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class PersonCreator {
@@ -21,33 +22,58 @@ public class PersonCreator {
     @Autowired
     private CoordinatesCreator coordinatesCreator;
 
-    @Transactional
-    public Person createPerson(
+    private Person map(
+            PersonDTO personDTO,
             Long id,
-            @NotNull String name,
-            Double locationX,
-            Float locationY,
-            Double locationZ,
-            int coordinatesX,
-            int coordinatesY,
-            Color eyeColor,
-            @NotNull Color hairColor,
-            int height,
-            @NotNull Country nationality,
-            LocalDateTime birthday,
             LocalDate creationDate
     ) {
+        Double locationX = null;
+        Float locationY = null;
+        Double locationZ = null;
+        if (personDTO.getLocation() != null) {
+            locationX = personDTO.getLocation().getX();
+            locationY = personDTO.getLocation().getY();
+            locationZ = personDTO.getLocation().getZ();
+        }
+
         Person person = new Person();
         person.setId(id);
-        person.setName(name);
-        person.setCoordinates(coordinatesCreator.createCoordinates(coordinatesX, coordinatesY));
-        person.setEyeColor(eyeColor);
-        person.setHairColor(hairColor);
+        person.setName(personDTO.getName());
+        person.setCoordinates(
+                coordinatesCreator.createCoordinates(
+                        personDTO.getCoordinates().getX(),
+                        personDTO.getCoordinates().getY()
+                )
+        );
+        person.setEyeColor(Color.valueOf(personDTO.getEyeColor()));
+        person.setHairColor(Color.valueOf(personDTO.getHairColor()));
         person.setLocation(locationCreator.createLocation(locationX, locationY, locationZ));
-        person.setHeight(height);
-        person.setBirthday(birthday);
-        person.setNationality(nationality);
+        person.setHeight(personDTO.getHeight());
+        person.setBirthday(personDTO.getBirthday().atStartOfDay());
+        person.setNationality(Country.valueOf(personDTO.getNationality()));
         person.setCreationDate(creationDate);
-        return personRepository.save(person);
+
+        return person;
+    }
+
+    @Transactional
+    public Person createPerson(
+            PersonDTO personDTO,
+            Long id,
+            LocalDate creationDate
+    ) {
+        return personRepository.save(map(personDTO, id, creationDate));
+    }
+
+    @Transactional
+    public List<Person> createPersons(
+            List<PersonDTO> personsDTO
+    ) {
+        List<Person> persons = new ArrayList<>();
+        for (PersonDTO personDTO : personsDTO) {
+            Person person = map(personDTO, null, LocalDate.now());
+            persons.add(person);
+        }
+        return personRepository.saveAll(persons);
     }
 }

@@ -20,7 +20,7 @@ public class Validation {
             return "Национальность обязательна";
         }
 
-        if (personDTO.getNationality() != null && !personDTO.getNationality().trim().isEmpty() && Country.containsTranslation(personDTO.getNationality())) {
+        if (personDTO.getNationality() != null && !personDTO.getNationality().trim().isEmpty() && !Country.isEnumValue(personDTO.getNationality())) {
             return "Национальность строго определенных значений";
         }
 
@@ -28,15 +28,19 @@ public class Validation {
             return "Рост должен быть ≥ 1";
         }
 
+        if (personDTO.getHeight() > 200) {
+            return "Рост должен быть не выше 200";
+        }
+
         if (personDTO.getHairColor() == null || personDTO.getHairColor().trim().isEmpty()) {
             return "Цвет волос обязателен";
         }
 
-        if (personDTO.getHairColor() != null && !personDTO.getHairColor().trim().isEmpty() && Color.containsTranslation(personDTO.getHairColor())) {
+        if (personDTO.getHairColor() != null && !personDTO.getHairColor().trim().isEmpty() && !Color.isEnumValue(personDTO.getHairColor())) {
             return "Цвет волос строго определенных значений";
         }
 
-        if (personDTO.getEyeColor() != null && !personDTO.getEyeColor().trim().isEmpty() && Color.containsTranslation(personDTO.getEyeColor())) {
+        if (personDTO.getEyeColor() != null && !personDTO.getEyeColor().trim().isEmpty() && !Color.isEnumValue(personDTO.getEyeColor())) {
             return "Цвет глаз строго определенных значений";
         }
 

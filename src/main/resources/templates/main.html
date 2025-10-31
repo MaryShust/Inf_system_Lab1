@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="edit.css">
     <link rel="stylesheet" href="create.css">
+    <link rel="stylesheet" href="upload.css">
     <link rel="stylesheet" href="find.css">
     <link rel="stylesheet" href="delete.css">
     <link rel="stylesheet" href="other.css">
@@ -19,6 +20,7 @@
     <ul class="tabs">
         <li class="tab active" data-tab="main">Главное</li>
         <li class="tab" data-tab="create">Создать</li>
+        <li class="tab" data-tab="upload">Загрузить данные из файла</li>
         <li class="tab" data-tab="find">Найти</li>
         <li class="tab" data-tab="delete">Удалить</li>
         <li class="tab" data-tab="other">Другое</li>
@@ -60,8 +62,6 @@
                 <span id="page" class="page"></span>
                 <button id="next-button">Вперед</button>
             </div>
-
-
             <dialog id="edit-modal">
                 <div class="modal-content">
                     <h2>Редактировать</h2>
@@ -240,6 +240,24 @@
             <button id="create-button">Создать</button>
         </div>
 
+        <div id="upload-tab" class="tab-pane">
+            <div class="upload-container">
+                <button id="upload-button">Загрузить</button>
+            </div>
+            <div id="upload-message" class="upload-message"></div>
+            <table id="upload-table">
+                <thead>
+                <tr>
+                    <th data-key="id">ID</th>
+                    <th data-key="state">Статус</th>
+                    <th data-key="author">Автор</th>
+                    <th data-key="count_object">Количество добавленных объектов</th>
+                </tr>
+                </thead>
+                <tbody id="upload-table-body"></tbody>
+            </table>
+        </div>
+
         <div id="find-tab" class="tab-pane">
             <div class="find-container">
                 <input type="text" id="find-input" placeholder="Введите ID">
@@ -364,6 +382,7 @@
 <script src="main.js"></script>
 <script src="edit.js"></script>
 <script src="create.js"></script>
+<script src="upload.js"></script>
 <script src="find.js"></script>
 <script src="delete.js"></script>
 <script src="other.js"></script>

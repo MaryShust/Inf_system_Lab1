@@ -36,30 +36,28 @@ public class PersonService {
             throw new ValidationException(validationResult);
         }
 
-        Double locationX = null;
-        Float locationY = null;
-        Double locationZ = null;
-        if (personDTO.getLocation() != null) {
-            locationX = personDTO.getLocation().getX();
-            locationY = personDTO.getLocation().getY();
-            locationZ = personDTO.getLocation().getZ();
-        }
-
         personCreator.createPerson(
+                personDTO,
                 null,
-                personDTO.getName(),
-                locationX,
-                locationY,
-                locationZ,
-                personDTO.getCoordinates().getX(),
-                personDTO.getCoordinates().getY(),
-                Color.valueOf(personDTO.getEyeColor()),
-                Color.valueOf(personDTO.getHairColor()),
-                personDTO.getHeight(),
-                Country.valueOf(personDTO.getNationality()),
-                personDTO.getBirthday().atStartOfDay(),
                 LocalDate.now()
         );
+    }
+
+    @Transactional
+    public int uploadPersons(String author, List<PersonDTO> personsDTO) throws IllegalArgumentException {
+        try {
+            for (PersonDTO personDTO : personsDTO) {
+                String validationResult = Validation.validation(personDTO);
+                if (validationResult != null) {
+                    System.out.println("ERROOOOR");
+                    throw new ValidationException(validationResult);
+                }
+            }
+            List<Person> persons = personCreator.createPersons(personsDTO);
+            return persons.size();
+        } catch(Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage());
+        }
     }
 
     @Transactional
@@ -72,20 +70,9 @@ public class PersonService {
         if (validationResult != null) {
             throw new ValidationException(validationResult);
         }
-
         personCreator.createPerson(
+                personDTO,
                 personDTO.getId(),
-                personDTO.getName(),
-                personDTO.getLocation().getX(),
-                personDTO.getLocation().getY(),
-                personDTO.getLocation().getZ(),
-                personDTO.getCoordinates().getX(),
-                personDTO.getCoordinates().getY(),
-                Color.valueOf(personDTO.getEyeColor()),
-                Color.valueOf(personDTO.getHairColor()),
-                personDTO.getHeight(),
-                Country.valueOf(personDTO.getNationality()),
-                personDTO.getBirthday().atStartOfDay(),
                 personDTO.getCreationDate()
         );
     }

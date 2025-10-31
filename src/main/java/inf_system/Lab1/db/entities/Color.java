@@ -1,7 +1,5 @@
 package inf_system.Lab1.db.entities;
 
-import java.util.Arrays;
-
 public enum Color {
     BLACK("Черный"),
     BLUE("Синий"),
@@ -19,13 +17,15 @@ public enum Color {
         return translation;
     }
 
-    // Метод для проверки наличия строки среди translation
-    public static boolean containsTranslation(String value) {
+    public static boolean isEnumValue(String value) {
         if (value == null || value.trim().isEmpty()) {
             return false;
         }
-
-        return Arrays.stream(Color.values())
-                .anyMatch(color -> color.getTranslation().equals(value));
+        try {
+            Color country = Color.valueOf(value.trim());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

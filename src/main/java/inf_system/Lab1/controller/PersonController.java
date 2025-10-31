@@ -3,7 +3,10 @@ package inf_system.Lab1.controller;
 import inf_system.Lab1.controller.dto.PersonDTO;
 import inf_system.Lab1.controller.exception.NotFoundException;
 import inf_system.Lab1.controller.exception.ValidationException;
+import inf_system.Lab1.services.AuthService;
+import inf_system.Lab1.services.HistoryService;
 import inf_system.Lab1.services.PersonService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,10 @@ public class PersonController {
 
     @Autowired
     private PersonService personService;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private HistoryService historyService;
 
     @PostMapping("/create_person")
     public ResponseEntity<?> createPerson(@RequestBody PersonDTO personDTO) {
@@ -26,6 +33,25 @@ public class PersonController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Неверное значение enum: " + e.getMessage());
         } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/upload_from_file")
+    public ResponseEntity<?> uploadPersons(HttpServletRequest request, @RequestBody List<PersonDTO> personsDTO) {
+        String userName = authService.getUserName(request);
+        try {
+            int size = personService.uploadPersons(userName, personsDTO);
+            historyService.updateHistory(userName, size);
+            return ResponseEntity.ok("Персоны успешно загружены и созданы");
+        } catch (ValidationException e) {
+            historyService.updateHistory(userName, 0);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            historyService.updateHistory(userName, 0);
+            return ResponseEntity.badRequest().body("Возникла ошибка: " + e.getMessage());
+        } catch (Exception ex) {
+            historyService.updateHistory(userName, 0);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
@@ -55,7 +81,6 @@ public class PersonController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
-
     @GetMapping("/delete_person")
     public ResponseEntity<String> deletePerson(@RequestParam Long id) {
         try {
