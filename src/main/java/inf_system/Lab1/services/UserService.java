@@ -15,17 +15,10 @@ public class UserService {
 
     @Transactional
     public Long findOrCreateUser(String name, String password) {
-        // БЫСТРАЯ ПРОВЕРКА БЕЗ БЛОКИРОВКИ (для оптимизации)
+
         Optional<User> existingUser = userRepository.findByNameAndPassword(name, password);
         if (existingUser.isPresent()) {
             return existingUser.get().getId(); // Быстрый путь - пользователь уже существует
-        }
-
-        existingUser = userRepository.findByNameAndPasswordWithLock(name, password);
-
-        // Double-check ПОД БЛОКИРОВКОЙ (на случай если между первой проверкой и блокировкой пользователь создался)
-        if (existingUser.isPresent()) {
-            return existingUser.get().getId();
         }
 
         User newUser = new User();
