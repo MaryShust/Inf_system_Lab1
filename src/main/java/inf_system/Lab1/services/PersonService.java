@@ -1,0 +1,180 @@
+package inf_system.Lab1.services;
+
+import inf_system.Lab1.controller.dto.PersonDTO;
+import inf_system.Lab1.controller.exception.NotFoundException;
+import inf_system.Lab1.controller.exception.ValidationException;
+import inf_system.Lab1.db.creators.PersonCreator;
+import inf_system.Lab1.db.entities.*;
+import inf_system.Lab1.db.repositories.CoordinatesRepository;
+import inf_system.Lab1.db.repositories.LocationRepository;
+import inf_system.Lab1.db.repositories.PersonRepository;
+import inf_system.Lab1.helper.Validation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import static inf_system.Lab1.db.entities.Person.getComparator;
+
+@Service
+public class PersonService {
+
+    @Autowired
+    private PersonCreator personCreator;
+    @Autowired
+    private PersonRepository personRepository;
+    @Autowired
+    private LocationRepository locationRepository;
+    @Autowired
+    private CoordinatesRepository coordinatesRepository;
+
+    @Transactional
+    public void createPerson(PersonDTO personDTO) {
+        String validationResult = Validation.validation(personDTO);
+        if (validationResult != null) {
+            throw new ValidationException(validationResult);
+        }
+
+        Double locationX = null;
+        Float locationY = null;
+        Double locationZ = null;
+        if (personDTO.getLocation() != null) {
+            locationX = personDTO.getLocation().getX();
+            locationY = personDTO.getLocation().getY();
+            locationZ = personDTO.getLocation().getZ();
+        }
+
+        personCreator.createPerson(
+                null,
+                personDTO.getName(),
+                locationX,
+                locationY,
+                locationZ,
+                personDTO.getCoordinates().getX(),
+                personDTO.getCoordinates().getY(),
+                Color.valueOf(personDTO.getEyeColor()),
+                Color.valueOf(personDTO.getHairColor()),
+                personDTO.getHeight(),
+                Country.valueOf(personDTO.getNationality()),
+                personDTO.getBirthday().atStartOfDay(),
+                LocalDate.now()
+        );
+    }
+
+    @Transactional
+    public void updatePerson(PersonDTO personDTO) {
+        // 🔒 Блокируем Person для обновления
+        personRepository.findByIdWithLock(personDTO.getId())
+                .orElseThrow(() -> new NotFoundException("Объекта с таким ID не существует"));
+
+        String validationResult = Validation.validation(personDTO);
+        if (validationResult != null) {
+            throw new ValidationException(validationResult);
+        }
+
+        personCreator.createPerson(
+                personDTO.getId(),
+                personDTO.getName(),
+                personDTO.getLocation().getX(),
+                personDTO.getLocation().getY(),
+                personDTO.getLocation().getZ(),
+                personDTO.getCoordinates().getX(),
+                personDTO.getCoordinates().getY(),
+                Color.valueOf(personDTO.getEyeColor()),
+                Color.valueOf(personDTO.getHairColor()),
+                personDTO.getHeight(),
+                Country.valueOf(personDTO.getNationality()),
+                personDTO.getBirthday().atStartOfDay(),
+                personDTO.getCreationDate()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PersonDTO findPerson(Long id) {
+        Person person = personRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Объекты с таким ID не существует"));
+        return PersonDTO.map(person);
+    }
+
+    @Transactional
+    public void deletePerson(Long id) {
+        Person person = personRepository.findByIdWithLock(id)
+                .orElseThrow(() -> new NotFoundException("Объекта с таким ID не существует"));
+        Location location = person.getLocation();
+        Coordinates coordinates = person.getCoordinates();
+        Long locationId = location != null ? location.getId() : null;
+        Long coordinatesId = coordinates != null ? coordinates.getId() : null;
+
+        personRepository.deleteById(id);
+
+        // Проверяем и удаляем Location, если больше не используется
+        // Атомарно удаляем если не используется
+        if (locationId != null) {
+            locationRepository.deleteIfUnused(locationId);
+        }
+
+        // Проверяем и удаляем Coordinates, если больше не используется
+        // Атомарно удаляем если не используется
+        if (coordinatesId != null) {
+            coordinatesRepository.deleteIfUnused(coordinatesId);
+        }
+    }
+
+    public List<PersonDTO> getPersons(int page, String sortField, String sortOrder, String search) {
+        List<Person> persons = filterPersons(search);
+
+        // Сортировка
+        Comparator<Person> comparator = getComparator(sortField, sortOrder);
+        List<Person> sortedPersons = persons.stream()
+                .sorted(comparator)
+                .toList();
+
+        // Пагинация
+        int pageSize = 10;
+        int totalItems = sortedPersons.size();
+        int fromIndex = Math.min((page - 1) * pageSize, totalItems);
+        int toIndex = Math.min(fromIndex + pageSize, totalItems);
+
+        List<Person> paginatedPersons = sortedPersons.subList(fromIndex, toIndex);
+
+        return paginatedPersons.stream()
+                .map(PersonDTO::map)
+                .toList();
+    }
+
+    public int getTotalPages(String search) {
+        List<Person> persons = filterPersons(search);
+        return (int) Math.ceil((double) persons.size() / 10);
+    }
+
+    private List<Person> filterPersons(String search) {
+        if (search == null) {
+            return personRepository.findAll();
+        }
+
+        String searchText = search.trim().toLowerCase();
+        return personRepository.findAll()
+                .stream()
+                .filter(p -> matchesSearch(p, searchText))
+                .toList();
+    }
+
+    private boolean matchesSearch(Person person, String searchText) {
+        Location location = person.getLocation();
+        Coordinates coordinates = person.getCoordinates();
+
+        return person.getName().toLowerCase().contains(searchText) ||
+        (coordinates != null && String.valueOf(coordinates.getX()).contains(searchText)) ||
+        (coordinates != null && String.valueOf(coordinates.getY()).contains(searchText)) ||
+        (location != null && String.valueOf(location.getX()).contains(searchText)) ||
+        (location != null && String.valueOf(location.getY()).contains(searchText)) ||
+        (location != null && String.valueOf(location.getZ()).contains(searchText)) ||
+        String.valueOf(person.getHeight()).contains(searchText) ||
+        (person.getEyeColor() != null && person.getEyeColor().getTranslation().contains(searchText)) ||
+        (person.getHairColor() != null && person.getHairColor().getTranslation().contains(searchText)) ||
+        (person.getNationality() != null && person.getNationality().getTranslation().contains(searchText)) ||
+        person.getCreationDate().toString().contains(searchText) ||
+                (person.getBirthday() != null && person.getBirthday().toLocalDate().toString().contains(searchText));
+    }
+}

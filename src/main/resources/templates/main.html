@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Основная страница</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="edit.css">
+    <link rel="stylesheet" href="create.css">
+    <link rel="stylesheet" href="find.css">
+    <link rel="stylesheet" href="delete.css">
+    <link rel="stylesheet" href="other.css">
+</head>
+<body>
+<header>
+    <h1 th:text="${userName}">userName</h1>
+    <a href="/logout" class="logout-link">Выйти</a>
+</header>
+
+<div class="tabs-container">
+    <ul class="tabs">
+        <li class="tab active" data-tab="main">Главное</li>
+        <li class="tab" data-tab="create">Создать</li>
+        <li class="tab" data-tab="find">Найти</li>
+        <li class="tab" data-tab="delete">Удалить</li>
+        <li class="tab" data-tab="other">Другое</li>
+    </ul>
+</div>
+
+<main>
+    <div class="tab-content">
+        <!-- Вкладка "Главное" -->
+        <div id="main-tab" class="tab-pane active">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Введите текст">
+                <button id="clear-button">Сбросить</button>
+                <button id="search-button">Найти</button>
+            </div>
+            <table id="persons-table">
+                <thead>
+                <tr>
+                    <th data-key="edit"></th>
+                    <th data-key="id">ID</th>
+                    <th data-key="name">Имя</th>
+                    <th data-key="birthday">Дата рождения</th>
+                    <th data-key="nationality">Национальность</th>
+                    <th data-key="height">Рост</th>
+                    <th data-key="hairColor">Цвет волос</th>
+                    <th data-key="eyeColor">Цвет глаз</th>
+                    <th data-key="coordinates.x">Координата x</th>
+                    <th data-key="coordinates.y">Координата y</th>
+                    <th data-key="location.x">Локация x</th>
+                    <th data-key="location.y">Локация y</th>
+                    <th data-key="location.z">Локация z</th>
+                    <th data-key="creationDate">Дата создания</th>
+                </tr>
+                </thead>
+                <tbody id="persons-table-body"></tbody>
+            </table>
+            <div id="navigation-container" class="navigation-container">
+                <button id="prev-button">Назад</button>
+                <span id="page" class="page"></span>
+                <button id="next-button">Вперед</button>
+            </div>
+
+
+            <dialog id="edit-modal">
+                <div class="modal-content">
+                    <h2>Редактировать</h2>
+                    <table id="edit-person-table" >
+                        <thead>
+                        <tr>
+                            <th data-key="key">Поле</th>
+                            <th data-key="value">Значение</th>
+                        </tr>
+                        </thead>
+                        <tbody id="edit-person-table-body">
+                            <tr>
+                                <th>Имя</th>
+                                <th><input type="text" id="edit_name_input"></th>
+                            </tr>
+                            <tr>
+                                <th>Дата рождения</th>
+                                <th><input type="date" id="edit_birthday_input"></th>
+                            </tr>
+                            <tr>
+                                <th>Национальность</th>
+                                <th>
+                                    <select id="edit_nationality_input">
+                                        <option value="GERMANY">Германия</option>
+                                        <option value="SPAIN">Испания</option>
+                                        <option value="VATICAN">Ватикан</option>
+                                        <option value="SOUTH_KOREA">Северная Корея</option>
+                                        <option value="JAPAN">Япония</option>
+                                    </select>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Рост</th>
+                                <th><input type="number" id="edit_height_input" min="1" step="1"></th>
+                            </tr>
+                            <tr>
+                                <th>Цвет волос</th>
+                                <th>
+                                    <select id="edit_hair_color_input">
+                                        <option value="BLACK">Черный</option>
+                                        <option value="BLUE">Синий</option>
+                                        <option value="YELLOW">Желтый</option>
+                                        <option value="ORANGE">Оранжевый</option>
+                                        <option value="WHITE">Белый</option>
+                                    </select>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Цвет глаз</th>
+                                <th>
+                                    <select id="edit_eye_color_input">
+                                        <option value="BLACK">Черный</option>
+                                        <option value="BLUE">Синий</option>
+                                        <option value="YELLOW">Желтый</option>
+                                        <option value="ORANGE">Оранжевый</option>
+                                        <option value="WHITE">Белый</option>
+                                    </select>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Локация</th>
+                                <th>
+                                    <select id="edit_location_select">
+                                        <option>Загрузка локаций...</option>
+                                    </select><br><br>
+                                    <input type="number" id="edit_location_x_input" placeholder="Введите x" min="1" step="1">
+                                    <input type="number" id="edit_location_y_input" placeholder="Введите y" min="1" step="1">
+                                    <input type="number" id="edit_location_z_input" placeholder="Введите z" min="1" step="1">
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Координаты</th>
+                                <th>
+                                    <select id="edit_coordinate_select">
+                                        <option>Загрузка координат...</option>
+                                    </select><br><br>
+                                    <input type="number" id="edit_coordinate_x_input" min="1" step="1">
+                                    <input type="number" id="edit_coordinate_y_input" min="1" step="1">
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Дата создания</th>
+                                <th><div id="edit_creation_date"></div></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="edit-message" class="edit-message"></div>
+                    <button id="edit-modal-button">Редактировать</button>
+                    <button id="close-modal-button">Закрыть</button>
+                </div>
+            </dialog>
+        </div>
+
+        <div id="create-tab" class="tab-pane">
+            <p>Форма создания объекта</p>
+            <table id="create-table" >
+                <thead>
+                <tr>
+                    <th>Поле</th>
+                    <th>Значение</th>
+                </tr>
+                </thead>
+                <tbody id="create-table-body">
+                    <tr>
+                        <th>Имя</th>
+                        <th><input type="text" id="create_name_input" placeholder="Введите имя"></th>
+                    </tr>
+                    <tr>
+                        <th>Дата рождения</th>
+                        <th><input type="date" id="create_birthday_input"></th>
+                    </tr>
+                    <tr>
+                        <th>Национальность</th>
+                        <th>
+                            <select id="create_nationality_input">
+                                <option value="GERMANY">Германия</option>
+                                <option value="SPAIN">Испания</option>
+                                <option value="VATICAN">Ватикан</option>
+                                <option value="SOUTH_KOREA">Северная Корея</option>
+                                <option value="JAPAN">Япония</option>
+                            </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Рост</th>
+                        <th><input type="number" id="create_height_input" placeholder="Введите рост" min="1" step="1"></th>
+                    </tr>
+                    <tr>
+                        <th>Цвет волос</th>
+                        <th>
+                            <select id="create_hair_color_input">
+                                <option value="BLACK">Черный</option>
+                                <option value="BLUE">Синий</option>
+                                <option value="YELLOW">Желтый</option>
+                                <option value="ORANGE">Оранжевый</option>
+                                <option value="WHITE">Белый</option>
+                            </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Цвет глаз</th>
+                        <th>
+                            <select id="create_eye_color_input">
+                                <option value="BLACK">Черный</option>
+                                <option value="BLUE">Синий</option>
+                                <option value="YELLOW">Желтый</option>
+                                <option value="ORANGE">Оранжевый</option>
+                                <option value="WHITE">Белый</option>
+                            </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Локация</th>
+                        <th>
+                            <select id="create_location_select">
+                                <option>Загрузка локаций...</option>
+                            </select><br><br>
+                            <input type="number" id="create_location_x_input" placeholder="Введите x" min="1" step="1">
+                            <input type="number" id="create_location_y_input" placeholder="Введите y" min="1" step="1">
+                            <input type="number" id="create_location_z_input" placeholder="Введите z" min="1" step="1">
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Координаты</th>
+                        <th>
+                            <select id="create_coordinate_select">
+                                <option>Загрузка координат...</option>
+                            </select><br><br>
+                            <input type="number" id="create_coordinate_x_input" placeholder="Введите x" min="1" step="1">
+                            <input type="number" id="create_coordinate_y_input" placeholder="Введите y" min="1" step="1">
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="create-message" class="create-message"></div>
+            <button id="create-button">Создать</button>
+        </div>
+
+        <div id="find-tab" class="tab-pane">
+            <div class="find-container">
+                <input type="text" id="find-input" placeholder="Введите ID">
+                <button id="find-button">Найти</button>
+            </div>
+            <div id="find-message" class="find-message"></div>
+            <table id="person-table" >
+                <thead>
+                <tr>
+                    <th data-key="key">Поле</th>
+                    <th data-key="value">Значение</th>
+                </tr>
+                </thead>
+                <tbody id="person-table-body"></tbody>
+            </table>
+        </div>
+
+        <div id="delete-tab" class="tab-pane">
+            <div class="delete-container">
+                <input type="text" id="delete-input" placeholder="Введите ID">
+                <button id="delete-button">Удалить</button>
+            </div>
+            <div id="delete-message" class="delete-message"></div>
+        </div>
+
+        <div id="other-tab" class="tab-pane">
+            <p><b>Средний рост людей:
+                <span id="average-height-message" class="average-height-message"></span>
+            </b></p><br>
+
+            <p><b>Найти самого молодого человека</b></p>
+            <div class="find-container">
+                <button id="max-birthday-button">Найти</button>
+            </div>
+            <table id="max-birthday-person-table">
+                <thead>
+                <tr>
+                    <th data-key="id">ID</th>
+                    <th data-key="name">Имя</th>
+                    <th data-key="birthday">Дата рождения</th>
+                    <th data-key="nationality">Национальность</th>
+                    <th data-key="height">Рост</th>
+                    <th data-key="hairColor">Цвет волос</th>
+                    <th data-key="eyeColor">Цвет глаз</th>
+                    <th data-key="coordinates.x">Координата x</th>
+                    <th data-key="coordinates.y">Координата y</th>
+                    <th data-key="location.x">Локация x</th>
+                    <th data-key="location.y">Локация y</th>
+                    <th data-key="location.z">Локация z</th>
+                    <th data-key="creationDate">Дата создания</th>
+                </tr>
+                </thead>
+                <tbody id="max-birthday-person-body"></tbody>
+            </table>
+            <div id="max-birthday-message" class="max-birthday-message"></div><br>
+
+            <p><b>Найти людей, чей рост выше чем</b></p>
+            <div class="find-container">
+                <input type="number" id="tall-people-input" placeholder="Введите рост" min="1" step="1">
+                <button id="tall-people-button">Найти</button>
+            </div>
+            <table id="tall-people-table">
+                <thead>
+                <tr>
+                    <th data-key="id">ID</th>
+                    <th data-key="name">Имя</th>
+                    <th data-key="birthday">Дата рождения</th>
+                    <th data-key="nationality">Национальность</th>
+                    <th data-key="height">Рост</th>
+                    <th data-key="hairColor">Цвет волос</th>
+                    <th data-key="eyeColor">Цвет глаз</th>
+                    <th data-key="coordinates.x">Координата x</th>
+                    <th data-key="coordinates.y">Координата y</th>
+                    <th data-key="location.x">Локация x</th>
+                    <th data-key="location.y">Локация y</th>
+                    <th data-key="location.z">Локация z</th>
+                    <th data-key="creationDate">Дата создания</th>
+                </tr>
+                </thead>
+                <tbody id="tall-people-body"></tbody>
+            </table>
+            <div id="tall-people-message" class="tall-people-message"></div><br>
+
+            <p><b>Количество людей с заданным цветом волос:
+                <span id="count-by-hair-color-message" class="count-by-hair-color-message"></span>
+            </b></p>
+            <div class="find-container">
+                <select id="count-by-hair-color_input">
+                    <option value="BLACK">Черный</option>
+                    <option value="BLUE">Синий</option>
+                    <option value="YELLOW">Желтый</option>
+                    <option value="ORANGE">Оранжевый</option>
+                    <option value="WHITE">Белый</option>
+                </select>
+                <button id="count-by-hair-color-button">Найти</button>
+            </div><br>
+
+            <p><b>Количество людей с заданным цветом волос в пределах указанной локации:
+                <span id="count-by-hair-color-in-location-message" class="count-by-hair-color-in-location-message"></span>
+            </b></p>
+            <div class="find-container">
+                <select id="count-by-hair-color-in-location_input">
+                    <option value="BLACK">Черный</option>
+                    <option value="BLUE">Синий</option>
+                    <option value="YELLOW">Желтый</option>
+                    <option value="ORANGE">Оранжевый</option>
+                    <option value="WHITE">Белый</option>
+                </select><br>
+                <input type="number" id="count-by-hair-color-in-location_min_location_x_input" style="margin-top: 5px;" placeholder="Введите мин x" min="1" step="1">
+                <input type="number" id="count-by-hair-color-in-location_max_location_x_input" placeholder="Введите макс x" min="1" step="1"><br>
+                <input type="number" id="count-by-hair-color-in-location_min_location_y_input" style="margin-top: 5px;" placeholder="Введите мин y" min="1" step="1">
+                <input type="number" id="count-by-hair-color-in-location_max_location_y_input" placeholder="Введите макс y" min="1" step="1"><br>
+                <input type="number" id="count-by-hair-color-in-location_min_location_z_input" style="margin-top: 5px;" placeholder="Введите мин z" min="1" step="1">
+                <input type="number" id="count-by-hair-color-in-location_max_location_z_input" placeholder="Введите макс z" min="1" step="1"><br>
+                <button id="count-by-hair-color-in-location-button" style="margin-top: 5px;">Найти</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="utils.js"></script>
+<script src="main.js"></script>
+<script src="edit.js"></script>
+<script src="create.js"></script>
+<script src="find.js"></script>
+<script src="delete.js"></script>
+<script src="other.js"></script>
+</body>
+</html>

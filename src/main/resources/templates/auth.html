@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Auth</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .password-input {
+            position: relative;
+        }
+        input[type="text"], input[type="password"] {
+            width: 90%;
+            height: 40px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .eye-icon {
+            position: absolute;
+            top: 30%;
+            transform: translateY(-50%);
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            height: 40px;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<form th:action="@{/auth}" method="post">
+    <h2>Авторизация</h2>
+    <label for="username">Имя:</label>
+    <input type="text" id="username" name="username">
+    <div class="error" id="username-error"></div>
+    <label for="password">Пароль:</label>
+    <div class="password-input">
+        <input type="password" id="password" name="password">
+        <span class="eye-icon" onclick="togglePasswordVisibility()">👀</span>
+    </div>
+    <div class="error" id="password-error"></div>
+    <input type="submit" value="Войти">
+</form>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            document.querySelector('.eye-icon').innerHTML = '🕶️';
+        } else {
+            passwordInput.type = 'password';
+            document.querySelector('.eye-icon').innerHTML = '👀';
+        }
+    }
+
+    document.querySelector('form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const usernameError = document.getElementById('username-error');
+        const passwordError = document.getElementById('password-error');
+
+        usernameError.textContent = '';
+        passwordError.textContent = '';
+
+        if (!username) {
+            usernameError.textContent = 'Необходимо заполнить поле имя';
+        }
+
+        if (!password) {
+            passwordError.textContent = 'Необходимо заполнить поле пароль';
+        }
+
+        if (username && password) {
+            document.querySelector('form').submit();
+        }
+    });
+</script>
+</body>
+</html>
