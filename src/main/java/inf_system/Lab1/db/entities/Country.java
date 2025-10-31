@@ -1,7 +1,5 @@
 package inf_system.Lab1.db.entities;
 
-import java.util.Arrays;
-
 public enum Country {
     GERMANY("Германия"),
     SPAIN("Испания"),
@@ -19,13 +17,15 @@ public enum Country {
         return translation;
     }
 
-    // Метод для проверки наличия строки среди translation
-    public static boolean containsTranslation(String value) {
+    public static boolean isEnumValue(String value) {
         if (value == null || value.trim().isEmpty()) {
             return false;
         }
-
-        return Arrays.stream(Country.values())
-                .anyMatch(country -> country.getTranslation().equals(value));
+        try {
+            Country country = Country.valueOf(value.trim());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
