@@ -1,15 +1,12 @@
 document.getElementById('upload-button').addEventListener('click', () => {
     const uploadMessage = document.getElementById('upload-message');
 
-    // Очистка сообщений
     uploadMessage.style.display = "none";
 
-    // Создаем input элемент для выбора файла
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.txt'; // Только txt файлы
 
-    // Обработчик выбора файла
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -17,14 +14,12 @@ document.getElementById('upload-button').addEventListener('click', () => {
         }
     });
 
-    // Запускаем диалог выбора файла
     fileInput.click();
 });
 
 function processFile(file) {
     const uploadMessage = document.getElementById('upload-message');
 
-    // Проверяем расширение файла
     if (!file.name.toLowerCase().endsWith('.txt')) {
         uploadMessage.textContent = "Выберите файл с расширением .txt";
         uploadMessage.className = "upload-message error";
@@ -48,17 +43,14 @@ function processFile(file) {
             const processedData = personsData.map(person => {
                 const updatedPerson = { ...person };
 
-                // Заменяем для eyeColor
                 if (updatedPerson.eyeColor && сolorMapping[updatedPerson.eyeColor]) {
                     updatedPerson.eyeColor = сolorMapping[updatedPerson.eyeColor];
                 }
 
-                // Заменяем для hairColor
                 if (updatedPerson.hairColor && сolorMapping[updatedPerson.hairColor]) {
                     updatedPerson.hairColor = сolorMapping[updatedPerson.hairColor];
                 }
 
-                // Заменяем для nationality
                 if (updatedPerson.nationality && countryMapping[updatedPerson.nationality]) {
                     updatedPerson.nationality = countryMapping[updatedPerson.nationality];
                 }
@@ -154,7 +146,6 @@ function updateUploadTable() {
             if (uploadTable) uploadTable.style.display = 'table';
 
 
-            // Заполняем таблицу
             tableBody.innerHTML = '';
             data.forEach(upload => {
                 const row = document.createElement('tr');
