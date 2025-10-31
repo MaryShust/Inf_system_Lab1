@@ -156,24 +156,6 @@ public class PersonService {
                 .toList();
     }
 
-//    private boolean matchesSearch(Person person, String searchText) {
-//        Location location = person.getLocation();
-//        Coordinates coordinates = person.getCoordinates();
-//
-//        return person.getName().toLowerCase().contains(searchText) ||
-//        (coordinates != null && String.valueOf(coordinates.getX()).contains(searchText)) ||
-//        (coordinates != null && String.valueOf(coordinates.getY()).contains(searchText)) ||
-//        (location != null && String.valueOf(location.getX()).contains(searchText)) ||
-//        (location != null && String.valueOf(location.getY()).contains(searchText)) ||
-//        (location != null && String.valueOf(location.getZ()).contains(searchText)) ||
-//        String.valueOf(person.getHeight()).contains(searchText) ||
-//        (person.getEyeColor() != null && person.getEyeColor().getTranslation().contains(searchText)) ||
-//        (person.getHairColor() != null && person.getHairColor().getTranslation().contains(searchText)) ||
-//        (person.getNationality() != null && person.getNationality().getTranslation().contains(searchText)) ||
-//        person.getCreationDate().toString().contains(searchText) ||
-//        (person.getBirthday() != null && person.getBirthday().toLocalDate().toString().contains(searchText));
-//    }
-
     private boolean matchesSearch(Person person, String searchText) {
         return matchesBasicFields(person, searchText)
                 || matchesCoordinates(person.getCoordinates(), searchText)
