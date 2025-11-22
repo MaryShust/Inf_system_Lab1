@@ -27,19 +27,19 @@ public class Validation {
         if (Country.valueOf(personDTO.getNationality()) == Country.GERMANY &&
                 !(Color.valueOf(personDTO.getEyeColor()) == Color.BLUE && Color.valueOf(personDTO.getHairColor()) ==Color.YELLOW)
         ) {
-            return "У немцов могут быть только бландинами с голубыми глазами";
+            return "У немцев могут быть только блондинами с голубыми глазами";
         }
 
         if (Country.valueOf(personDTO.getNationality()) == Country.JAPAN &&
                 !(personDTO.getHeight() <= 170 && Color.valueOf(personDTO.getEyeColor()) == Color.BLACK)
         ) {
-            return "У японцов могут быть только черные волосы и рост не выше 170";
+            return "У японцев могут быть только черные волосы и рост не выше 170";
         }
 
         if (Country.valueOf(personDTO.getNationality()) == Country.SOUTH_KOREA &&
                 !(Color.valueOf(personDTO.getEyeColor()) == Color.BLACK && Color.valueOf(personDTO.getHairColor()) ==Color.BLACK)
         ) {
-            return "У карейцев могут быть только черные волосы и глаза";
+            return "У корейцев могут быть только черные волосы и глаза";
         }
 
         if (personDTO.getHeight() < 1) {
