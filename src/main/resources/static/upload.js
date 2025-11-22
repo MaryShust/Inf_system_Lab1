@@ -1,12 +1,15 @@
 document.getElementById('upload-button').addEventListener('click', () => {
     const uploadMessage = document.getElementById('upload-message');
 
+    // Очистка сообщений
     uploadMessage.style.display = "none";
 
+    // Создаем input элемент для выбора файла
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.accept = '.txt'; // Только txt файлы
+    fileInput.accept = '.txt,.json';
 
+    // Обработчик выбора файла
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -14,14 +17,16 @@ document.getElementById('upload-button').addEventListener('click', () => {
         }
     });
 
+    // Запускаем диалог выбора файла
     fileInput.click();
 });
 
 function processFile(file) {
     const uploadMessage = document.getElementById('upload-message');
 
-    if (!file.name.toLowerCase().endsWith('.txt')) {
-        uploadMessage.textContent = "Выберите файл с расширением .txt";
+    // Проверяем расширение файла
+    if (!file.name.toLowerCase().endsWith('.txt') && !file.name.toLowerCase().endsWith('.json')) {
+        uploadMessage.textContent = "Выберите файл с расширением .txt или .json";
         uploadMessage.className = "upload-message error";
         uploadMessage.style.display = "block";
         return;
@@ -33,8 +38,10 @@ function processFile(file) {
         try {
             const fileContent = e.target.result;
 
+            // Пытаемся распарсить JSON
             const personsData = JSON.parse(fileContent);
 
+            // Проверяем, что это массив
             if (!Array.isArray(personsData)) {
                 throw new Error("Файл должен содержать массив объектов");
             }
@@ -43,14 +50,17 @@ function processFile(file) {
             const processedData = personsData.map(person => {
                 const updatedPerson = { ...person };
 
+                // Заменяем для eyeColor
                 if (updatedPerson.eyeColor && сolorMapping[updatedPerson.eyeColor]) {
                     updatedPerson.eyeColor = сolorMapping[updatedPerson.eyeColor];
                 }
 
+                // Заменяем для hairColor
                 if (updatedPerson.hairColor && сolorMapping[updatedPerson.hairColor]) {
                     updatedPerson.hairColor = сolorMapping[updatedPerson.hairColor];
                 }
 
+                // Заменяем для nationality
                 if (updatedPerson.nationality && countryMapping[updatedPerson.nationality]) {
                     updatedPerson.nationality = countryMapping[updatedPerson.nationality];
                 }
@@ -58,6 +68,7 @@ function processFile(file) {
                 return updatedPerson;
             });
 
+            // Отправляем данные на сервер
             uploadPersons(processedData);
 
         } catch (error) {
@@ -107,8 +118,7 @@ function uploadPersons(personsData) {
             setTimeout(() => {
                 uploadMessage.style.display = "none";
             }, 5000);
-
-            updateUploadTable();
+updateUploadTable();
         }
     });
 }
@@ -117,7 +127,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Найти вкладку "Другое"
     const otherTab = document.querySelector('[data-tab="upload"]');
 
+    // Добавить обработчик клика
     otherTab.addEventListener("click", function () {
+        // Проверить, активна ли вкладка (если нужно)
         if (!otherTab.classList.contains("active")) return;
 
         updateUploadTable();
@@ -134,6 +146,7 @@ function updateUploadTable() {
             console.log(!data);
             console.log(data.length === 0);
 
+            // Проверяем, есть ли данные
             if (!data || data.length === 0) {
                 // Скрываем таблицу, показываем сообщение
                 if (uploadTable) uploadTable.style.display = 'none';
@@ -146,6 +159,7 @@ function updateUploadTable() {
             if (uploadTable) uploadTable.style.display = 'table';
 
 
+            // Заполняем таблицу
             tableBody.innerHTML = '';
             data.forEach(upload => {
                 const row = document.createElement('tr');

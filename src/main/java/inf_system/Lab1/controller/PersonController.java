@@ -63,6 +63,8 @@ public class PersonController {
             return ResponseEntity.ok("Персона успешно обновлена");
         } catch (ValidationException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Неверное значение enum: " + e.getMessage());
         } catch (Exception ex) {

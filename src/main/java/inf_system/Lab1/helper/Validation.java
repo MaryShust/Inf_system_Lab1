@@ -24,12 +24,26 @@ public class Validation {
             return "Национальность строго определенных значений";
         }
 
-        if (personDTO.getHeight() < 1) {
-            return "Рост должен быть ≥ 1";
+        if (Country.valueOf(personDTO.getNationality()) == Country.GERMANY &&
+                !(Color.valueOf(personDTO.getEyeColor()) == Color.BLUE && Color.valueOf(personDTO.getHairColor()) ==Color.YELLOW)
+        ) {
+            return "У немцов могут быть только бландинами с голубыми глазами";
         }
 
-        if (personDTO.getHeight() > 200) {
-            return "Рост должен быть не выше 200";
+        if (Country.valueOf(personDTO.getNationality()) == Country.JAPAN &&
+                !(personDTO.getHeight() <= 170 && Color.valueOf(personDTO.getEyeColor()) == Color.BLACK)
+        ) {
+            return "У японцов могут быть только черные волосы и рост не выше 170";
+        }
+
+        if (Country.valueOf(personDTO.getNationality()) == Country.SOUTH_KOREA &&
+                !(Color.valueOf(personDTO.getEyeColor()) == Color.BLACK && Color.valueOf(personDTO.getHairColor()) ==Color.BLACK)
+        ) {
+            return "У карейцев могут быть только черные волосы и глаза";
+        }
+
+        if (personDTO.getHeight() < 1) {
+            return "Рост должен быть ≥ 1";
         }
 
         if (personDTO.getHairColor() == null || personDTO.getHairColor().trim().isEmpty()) {
