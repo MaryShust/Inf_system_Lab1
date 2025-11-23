@@ -78,7 +78,7 @@ function loadCoordinates(coordinateSelect) {
 function isValidEditText(id, message, className) {
     if (!id) {
         message.textContent = "Введите ID для удаления";
-        message.className = `${className} error`;
+        message.className = '${className} error';
         message.style.display = "block";
         return false;
     }
@@ -86,7 +86,7 @@ function isValidEditText(id, message, className) {
     // Проверка на целое число
     if (!/^\d+$/.test(id)) {
         message.textContent = "ID должен быть целым положительным числом";
-        message.className = ${className} error;
+        message.className = '${className} error';
         message.style.display = "block";
         return false;
     }
@@ -116,11 +116,11 @@ function form_person_validation(nameInput, birthdayInput, nationalitySelect, hei
     }
 
     if (nationalitySelect.value == 'GERMANY' && !(eyeColorSelect.value == 'BLUE' && hairColorSelect.value == 'YELLOW')) {
-        errors.push('У немцов могут быть только бландинами с голубыми глазами');
+        errors.push('У немцев могут быть только блондинами с голубыми глазами');
     }
 
     if (nationalitySelect.value == 'JAPAN' && !(eyeColorSelect.value == 'BLACK' && parseInt(heightInput.value) <= 170)) {
-        errors.push('У японцов могут быть только черные волосы и рост не выше 170');
+        errors.push('У японцев могут быть только черные волосы и рост не выше 170');
     }
 if (nationalitySelect.value == 'SOUTH_KOREA' && !(eyeColorSelect.value == 'BLACK' && hairColorSelect.value == 'BLACK')) {
         errors.push('У карейцев могут быть только черные волосы и глаза');

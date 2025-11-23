@@ -2,6 +2,7 @@ package inf_system.Lab1.controller;
 
 import inf_system.Lab1.controller.dto.PersonDTO;
 import inf_system.Lab1.controller.exception.NotFoundException;
+import inf_system.Lab1.controller.exception.UniqueException;
 import inf_system.Lab1.controller.exception.ValidationException;
 import inf_system.Lab1.services.AuthService;
 import inf_system.Lab1.services.HistoryService;
@@ -28,7 +29,7 @@ public class PersonController {
         try {
             personService.createPerson(personDTO);
             return ResponseEntity.ok("Персона успешно создана");
-        } catch (ValidationException e) {
+        } catch (ValidationException | UniqueException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Неверное значение enum: " + e.getMessage());
@@ -44,7 +45,7 @@ public class PersonController {
             int size = personService.uploadPersons(userName, personsDTO);
             historyService.updateHistory(userName, size);
             return ResponseEntity.ok("Персоны успешно загружены и созданы");
-        } catch (ValidationException e) {
+        } catch (ValidationException | UniqueException e) {
             historyService.updateHistory(userName, 0);
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -61,7 +62,7 @@ public class PersonController {
         try {
             personService.updatePerson(personDTO);
             return ResponseEntity.ok("Персона успешно обновлена");
-        } catch (ValidationException e) {
+        } catch (ValidationException | UniqueException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

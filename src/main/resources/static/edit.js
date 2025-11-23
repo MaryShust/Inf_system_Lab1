@@ -168,8 +168,15 @@ document.getElementById('edit-modal-button').addEventListener('click', () => {
                 updatePersonsTable();
                 modal.close();
             } else {
-                console.error('Ошибка загрузки данных:', error)
-                modal.close();
+                response.text().then(errorMessage => {
+                    messageDiv.textContent = errorMessage;
+                    messageDiv.className = 'create-message error';
+                    messageDiv.style.display = 'block';
+
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 5000);
+                });
             }
         })
         .catch(error => {

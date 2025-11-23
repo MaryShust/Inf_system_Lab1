@@ -2,6 +2,7 @@ package inf_system.Lab1.services;
 
 import inf_system.Lab1.controller.dto.PersonDTO;
 import inf_system.Lab1.controller.exception.NotFoundException;
+import inf_system.Lab1.controller.exception.UniqueException;
 import inf_system.Lab1.controller.exception.ValidationException;
 import inf_system.Lab1.db.creators.PersonCreator;
 import inf_system.Lab1.db.entities.*;
@@ -31,6 +32,10 @@ public class PersonService {
 
     @Transactional
     public void createPerson(PersonDTO personDTO) {
+        if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
+            throw new UniqueException("Объект должен быть уникальным по имени и росту");
+        }
+
         String validationResult = Validation.validation(personDTO);
         if (validationResult != null) {
             throw new ValidationException(validationResult);
@@ -47,9 +52,12 @@ public class PersonService {
     public int uploadPersons(String author, List<PersonDTO> personsDTO) throws IllegalArgumentException {
         try {
             for (PersonDTO personDTO : personsDTO) {
+                if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
+                    throw new UniqueException("Объект должен быть уникальным по имени и росту");
+                }
+
                 String validationResult = Validation.validation(personDTO);
                 if (validationResult != null) {
-                    System.out.println("ERROOOOR");
                     throw new ValidationException(validationResult);
                 }
             }
@@ -62,9 +70,12 @@ public class PersonService {
 
     @Transactional
     public void updatePerson(PersonDTO personDTO) {
-        // 🔒 Блокируем Person для обновления
         personRepository.findByIdWithLock(personDTO.getId())
                 .orElseThrow(() -> new NotFoundException("Объекта с таким ID не существует"));
+
+        if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
+            throw new UniqueException("Объект должен быть уникальным по имени и росту");
+        }
 
         String validationResult = Validation.validation(personDTO);
         if (validationResult != null) {
