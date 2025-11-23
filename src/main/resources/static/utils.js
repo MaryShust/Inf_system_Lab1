@@ -127,7 +127,7 @@ if (nationalitySelect.value == 'SOUTH_KOREA' && !(eyeColorSelect.value == 'BLACK
     }
 
     // Проверка роста
-    if (!heightInput.value  parseInt(heightInput.value) < 1) {
+    if (!heightInput.value || parseInt(heightInput.value) < 1) {
         errors.push('Рост должен быть целым числом ≥ 1');
     }
 
@@ -137,20 +137,20 @@ if (nationalitySelect.value == 'SOUTH_KOREA' && !(eyeColorSelect.value == 'BLACK
     }
 
     // Проверка координат
-    if (!coordX.value  !coordY.value) {
+    if (!coordX.value || !coordY.value) {
         errors.push('Все координаты (X, Y) обязательны');
     } else {
         if (!Number.isInteger(Number(coordX.value))) {
             errors.push('Координата X должна быть целочисленным числом');
         } else {
-            if (!Number.isInteger(Number(coordX.value))  Number(coordX.value) > 674) {
+            if (!Number.isInteger(Number(coordX.value)) || Number(coordX.value) > 674) {
                 errors.push('Координата X должна быть не больше 674');
             }
         }
         if (!Number.isInteger(Number(coordY.value))) {
             errors.push('Координата Y должна быть целочисленным числом');
         } else {
-            if (!Number.isInteger(Number(coordY.value))  Number(coordY.value) < -554) {
+            if (!Number.isInteger(Number(coordY.value)) || Number(coordY.value) < -554) {
                 errors.push('Координата Y не должна быть меньше -554');
             }
         }
