@@ -157,8 +157,8 @@ if (nationalitySelect.value == 'SOUTH_KOREA' && !(eyeColorSelect.value == 'BLACK
     }
 
     if (
-        (locationX.value && (!locationY.value  !locationZ.value))
-        (locationY.value && (!locationX.value  !locationZ.value))
+        (locationX.value && (!locationY.value || !locationZ.value))
+        (locationY.value && (!locationX.value || !locationZ.value))
         (locationZ.value && (!locationX.value || !locationY.value))
     ) {
         errors.push('Локация не может быть частичной');
