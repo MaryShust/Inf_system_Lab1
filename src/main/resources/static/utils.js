@@ -78,7 +78,7 @@ function loadCoordinates(coordinateSelect) {
 function isValidEditText(id, message, className) {
     if (!id) {
         message.textContent = "Введите ID для удаления";
-        message.className = '${className} error';
+        message.className = `${className} error`;
         message.style.display = "block";
         return false;
     }
@@ -86,7 +86,7 @@ function isValidEditText(id, message, className) {
     // Проверка на целое число
     if (!/^\d+$/.test(id)) {
         message.textContent = "ID должен быть целым положительным числом";
-        message.className = '${className} error';
+        message.className = `${className} error`;
         message.style.display = "block";
         return false;
     }
