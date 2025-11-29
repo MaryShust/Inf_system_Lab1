@@ -1,10 +1,8 @@
 package infSystem.Lab1.controller;
 
 import infSystem.Lab1.controller.dto.PersonDTO;
-import infSystem.Lab1.controller.exception.NotFoundException;
 import infSystem.Lab1.services.PersonStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,50 +18,26 @@ public class PersonOtherController {
 
     @GetMapping("/average-height")
     public ResponseEntity<?> getAverageHeight() {
-        try {
-            BigDecimal averageHeight = personStatisticsService.getAverageHeight();
-            return ResponseEntity.ok(averageHeight);
-        } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        BigDecimal averageHeight = personStatisticsService.getAverageHeight();
+        return ResponseEntity.ok(averageHeight);
     }
 
     @GetMapping("/max-birthday")
     public ResponseEntity<?> getPersonWithMaxBirthday() {
-        try {
-            PersonDTO result = personStatisticsService.getPersonWithMaxBirthday();
-            return ResponseEntity.ok(result);
-        } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        PersonDTO result = personStatisticsService.getPersonWithMaxBirthday();
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/tall-people")
     public ResponseEntity<?> getTallPeople(@RequestParam int minHeight) {
-        try {
-            List<PersonDTO> result = personStatisticsService.getTallPeople(minHeight);
-            return ResponseEntity.ok(result);
-        } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        List<PersonDTO> result = personStatisticsService.getTallPeople(minHeight);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/count-by-hair-color")
     public ResponseEntity<?> countByHairColor(@RequestParam String hairColor) {
-        try {
-            long result = personStatisticsService.countByHairColor(hairColor);
-            return ResponseEntity.ok(result);
-        } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        long result = personStatisticsService.countByHairColor(hairColor);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/count-by-hair-color-in-location")
@@ -76,14 +50,7 @@ public class PersonOtherController {
             @RequestParam double zMin,
             @RequestParam double zMax
     ) {
-        try {
-            long result = personStatisticsService.countByHairColorInLocation(
-                    hairColor, xMin, xMax, yMin, yMax, zMin, zMax);
-            return ResponseEntity.ok(result);
-        } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
+        long result = personStatisticsService.countByHairColorInLocation(hairColor, xMin, xMax, yMin, yMax, zMin, zMax);
+        return ResponseEntity.ok(result);
     }
 }

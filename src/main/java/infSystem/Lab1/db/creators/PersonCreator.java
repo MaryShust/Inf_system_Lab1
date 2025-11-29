@@ -67,13 +67,13 @@ public class PersonCreator {
 
     @Transactional
     public List<Person> createPeople(
-            List<PersonDTO> personsDTO
+            List<PersonDTO> peopleDTO
     ) {
-        List<Person> persons = new ArrayList<>();
-        for (PersonDTO personDTO : personsDTO) {
+        List<Person> people = new ArrayList<>();
+        for (PersonDTO personDTO : peopleDTO) {
             Person person = map(personDTO, null, LocalDate.now());
-            persons.add(person);
+            people.add(person);
         }
-        return personRepository.saveAll(persons);
+        return personRepository.saveAll(people);
     }
 }
