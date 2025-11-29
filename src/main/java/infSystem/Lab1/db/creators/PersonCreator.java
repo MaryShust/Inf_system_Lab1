@@ -8,20 +8,31 @@ import infSystem.Lab1.db.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class PersonCreator {
 
+    private final PersonRepository personRepository;
+    private final LocationCreator locationCreator;
+    private final CoordinatesCreator coordinatesCreator;
+    private final Clock clock;
+
     @Autowired
-    private PersonRepository personRepository;
-    @Autowired
-    private LocationCreator locationCreator;
-    @Autowired
-    private CoordinatesCreator coordinatesCreator;
+    public PersonCreator(
+            PersonRepository personRepository,
+            LocationCreator locationCreator,
+            CoordinatesCreator coordinatesCreator,
+            Clock clock
+    ) {
+        this.personRepository = personRepository;
+        this.locationCreator = locationCreator;
+        this.coordinatesCreator = coordinatesCreator;
+        this.clock = clock;
+    }
 
     private Person map(
             PersonDTO personDTO,
@@ -71,7 +82,7 @@ public class PersonCreator {
             List<PersonDTO> peopleDTO
     ) {
         List<Person> people = peopleDTO.stream()
-                .map(personDTO -> map(personDTO, null, LocalDate.now()))
+                .map(personDTO -> map(personDTO, null, LocalDate.now(clock)))
                 .collect(Collectors.toList());
         return personRepository.saveAll(people);
     }

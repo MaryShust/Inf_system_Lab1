@@ -3,6 +3,8 @@ package infSystem.Lab1.services;
 import infSystem.Lab1.controller.dto.PersonDTO;
 import infSystem.Lab1.controller.exception.NotFoundException;
 import infSystem.Lab1.controller.exception.ValidationException;
+import infSystem.Lab1.db.creators.CoordinatesCreator;
+import infSystem.Lab1.db.creators.LocationCreator;
 import infSystem.Lab1.db.creators.PersonCreator;
 import infSystem.Lab1.db.entities.Coordinates;
 import infSystem.Lab1.db.entities.Location;
@@ -15,6 +17,8 @@ import infSystem.Lab1.controller.exception.UniqueViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -22,14 +26,26 @@ import java.util.List;
 @Service
 public class PersonService {
 
+    private final PersonCreator personCreator;
+    private final PersonRepository personRepository;
+    private final LocationRepository locationRepository;
+    private final CoordinatesRepository coordinatesRepository;
+    private final Clock clock;
+
     @Autowired
-    private PersonCreator personCreator;
-    @Autowired
-    private PersonRepository personRepository;
-    @Autowired
-    private LocationRepository locationRepository;
-    @Autowired
-    private CoordinatesRepository coordinatesRepository;
+    public PersonService(
+            PersonCreator personCreator,
+            PersonRepository personRepository,
+            LocationRepository locationRepository,
+            CoordinatesRepository coordinatesRepository,
+            Clock clock
+    ) {
+        this.personCreator = personCreator;
+        this.personRepository = personRepository;
+        this.locationRepository = locationRepository;
+        this.coordinatesRepository = coordinatesRepository;
+        this.clock = clock;
+    }
 
     @Transactional
     public void createPerson(PersonDTO personDTO) {
@@ -45,7 +61,7 @@ public class PersonService {
         personCreator.createPerson(
                 personDTO,
                 null,
-                LocalDate.now()
+                LocalDate.now(clock)
         );
     }
 
