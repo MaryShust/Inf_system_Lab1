@@ -1,0 +1,38 @@
+package infSystem.Lab1.db.entities;
+
+import infSystem.Lab1.controller.exception.ValidationException;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "coordinates")
+@Getter
+@ToString
+public class Coordinates {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "x")
+    private int x;
+
+    @Column(name = "y")
+    private int y;
+
+    public void setX(int x) {
+        if (x > 674) {
+            throw new ValidationException("X не может быть больше 674");
+        }
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        if (y < -554) {
+            throw new ValidationException("Y не может быть меньше -554");
+        }
+        this.y = y;
+    }
+}

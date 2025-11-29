@@ -63,26 +63,6 @@ document.getElementById('create-button').addEventListener('click', () => {
     const coordY = document.getElementById('create_coordinate_y_input');
     const messageDiv = document.getElementById('create-message');
 
-    const errors = form_person_validation(
-        nameInput,
-        birthdayInput,
-        nationalitySelect,
-        heightInput,
-        hairColorSelect,
-        eyeColorSelect,
-        locationX,
-        locationY,
-        locationZ,
-        coordX,
-        coordY,
-        messageDiv
-    )
-
-    if (errors.length > 0) {
-        return;
-    }
-
-    // Если ошибок нет — можно отправлять данные
     const formData = {
         name: nameInput.value.trim(),
         birthday: birthdayInput.value,

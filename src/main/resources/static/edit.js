@@ -44,10 +44,10 @@ function openEditModal(personId) {
 
                     document.getElementById('edit_name_input').value = person.name || '';
                     document.getElementById('edit_birthday_input').value = person.birthday || '';
-                    document.getElementById('edit_nationality_input').value = countryMapping[person.nationality] || '';
+                    document.getElementById('edit_nationality_input').value = person.nationality || '';
                     document.getElementById('edit_height_input').value = person.height || '';
-                    document.getElementById('edit_hair_color_input').value = сolorMapping[person.hairColor] || '';
-                    document.getElementById('edit_eye_color_input').value = сolorMapping[person.eyeColor] || '';
+                    document.getElementById('edit_hair_color_input').value = person.hairColor || '';
+                    document.getElementById('edit_eye_color_input').value = person.eyeColor || '';
 
                     // Координаты
                     if (person.coordinates) {
@@ -111,28 +111,6 @@ document.getElementById('edit-modal-button').addEventListener('click', () => {
     const creationDate = document.getElementById('edit_creation_date');
     const messageDiv = document.getElementById('edit-message');
 
-
-
-    const errors = form_person_validation(
-        nameInput,
-        birthdayInput,
-        nationalitySelect,
-        heightInput,
-        hairColorSelect,
-        eyeColorSelect,
-        locationX,
-        locationY,
-        locationZ,
-        coordX,
-        coordY,
-        messageDiv
-    )
-
-    if (errors.length > 0) {
-        return;
-    }
-
-    // Если ошибок нет — можно отправлять данные
     const formData = {
         id: editPersonId,
         name: nameInput.value.trim(),

@@ -46,31 +46,7 @@ function processFile(file) {
                 throw new Error("Файл должен содержать массив объектов");
             }
 
-            // Обрабатываем данные - заменяем цвета используя colorMapping
-            const processedData = personsData.map(person => {
-                const updatedPerson = { ...person };
-
-                // Заменяем для eyeColor
-                if (updatedPerson.eyeColor && сolorMapping[updatedPerson.eyeColor]) {
-                    updatedPerson.eyeColor = сolorMapping[updatedPerson.eyeColor];
-                }
-
-                // Заменяем для hairColor
-                if (updatedPerson.hairColor && сolorMapping[updatedPerson.hairColor]) {
-                    updatedPerson.hairColor = сolorMapping[updatedPerson.hairColor];
-                }
-
-                // Заменяем для nationality
-                if (updatedPerson.nationality && countryMapping[updatedPerson.nationality]) {
-                    updatedPerson.nationality = countryMapping[updatedPerson.nationality];
-                }
-
-                return updatedPerson;
-            });
-
-            // Отправляем данные на сервер
-            uploadPersons(processedData);
-
+            uploadPersons(personsData);
         } catch (error) {
             uploadMessage.textContent = "Файл не удалось распарсить";
             uploadMessage.className = "upload-message error";
