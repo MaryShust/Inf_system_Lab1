@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PersonCreator {
@@ -69,11 +70,9 @@ public class PersonCreator {
     public List<Person> createPeople(
             List<PersonDTO> peopleDTO
     ) {
-        List<Person> people = new ArrayList<>();
-        for (PersonDTO personDTO : peopleDTO) {
-            Person person = map(personDTO, null, LocalDate.now());
-            people.add(person);
-        }
+        List<Person> people = peopleDTO.stream()
+                .map(personDTO -> map(personDTO, null, LocalDate.now()))
+                .collect(Collectors.toList());
         return personRepository.saveAll(people);
     }
 }

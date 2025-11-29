@@ -50,20 +50,29 @@ public class PersonService {
     }
 
     @Transactional
-    public int uploadPeople(String author, List<PersonDTO> people) throws IllegalArgumentException {
+    public int uploadPeople(String author, List<PersonDTO> peopleDTO) throws IllegalArgumentException {
         try {
-            for (PersonDTO personDTO : people) {
-                if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
-                    throw new UniqueViolationException("Объект должен быть уникальным по имени и росту");
-                }
+            peopleDTO.stream()
+                    .forEach(personDTO -> {
+                        boolean isDuplicate = personRepository.findByNameAndHeightWithLock(
+                                        personDTO.getName(),
+                                        personDTO.getHeight()
+                                )
+                                .get()
+                                .stream()
+                                .anyMatch(p -> true);
 
-                String validationResult = Validation.validation(personDTO);
-                if (validationResult != null) {
-                    throw new ValidationException(validationResult);
-                }
-            }
-            List<Person> persons = personCreator.createPeople(people);
-            return persons.size();
+                        if (isDuplicate) {
+                            throw new UniqueViolationException("Объект должен быть уникальным по имени и росту");
+                        }
+
+                        String validationResult = Validation.validation(personDTO);
+                        if (validationResult != null) {
+                            throw new ValidationException(validationResult);
+                        }
+                    });
+            List<Person> people = personCreator.createPeople(peopleDTO);
+            return people.size();
         } catch(Exception ex) {
             throw new IllegalArgumentException(ex.getMessage());
         }
@@ -118,32 +127,32 @@ public class PersonService {
         }
     }
 
-    public List<PersonDTO> getPersons(int page, String sortField, String sortOrder, String search) {
-        List<Person> persons = filterPersons(search);
+    public List<PersonDTO> getPeople(int page, String sortField, String sortOrder, String search) {
+        List<Person> people = filterPeople(search);
 
         Comparator<Person> comparator = Person.getComparator(sortField, sortOrder);
-        List<Person> sortedPersons = persons.stream()
+        List<Person> sortedPeople = people.stream()
                 .sorted(comparator)
                 .toList();
 
         int pageSize = 10;
-        int totalItems = sortedPersons.size();
+        int totalItems = sortedPeople.size();
         int fromIndex = Math.min((page - 1) * pageSize, totalItems);
         int toIndex = Math.min(fromIndex + pageSize, totalItems);
 
-        List<Person> paginatedPersons = sortedPersons.subList(fromIndex, toIndex);
+        List<Person> paginatedPeople = sortedPeople.subList(fromIndex, toIndex);
 
-        return paginatedPersons.stream()
+        return paginatedPeople.stream()
                 .map(PersonDTO::map)
                 .toList();
     }
 
     public int getTotalPages(String search) {
-        List<Person> persons = filterPersons(search);
-        return (int) Math.ceil((double) persons.size() / 10);
+        List<Person> people = filterPeople(search);
+        return (int) Math.ceil((double) people.size() / 10);
     }
 
-    private List<Person> filterPersons(String search) {
+    private List<Person> filterPeople(String search) {
         if (search == null) {
             return personRepository.findAll();
         }

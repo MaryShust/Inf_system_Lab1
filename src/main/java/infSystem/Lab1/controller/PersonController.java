@@ -31,7 +31,7 @@ public class PersonController {
     }
 
     @PostMapping("/upload_from_file")
-    public ResponseEntity<?> uploadPersons(HttpServletRequest request, @RequestBody List<PersonDTO> people) {
+    public ResponseEntity<?> uploadPeople(HttpServletRequest request, @RequestBody List<PersonDTO> people) {
         String userName = authService.getUserName(request);
         try {
             int size = personService.uploadPeople(userName, people);
@@ -64,18 +64,18 @@ public class PersonController {
     }
 
     @GetMapping("/persons")
-    public ResponseEntity<List<PersonDTO>> getAllPersons(
+    public ResponseEntity<List<PersonDTO>> getAllPeople(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String search
     ) {
-        List<PersonDTO> result = personService.getPersons(page, sortField, sortOrder, search);
+        List<PersonDTO> result = personService.getPeople(page, sortField, sortOrder, search);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/all_pages")
-    public ResponseEntity<Integer> getCountPersons(
+    public ResponseEntity<Integer> getCountPeople(
             @RequestParam(required = false) String search
     ) {
         int totalPages = personService.getTotalPages(search);

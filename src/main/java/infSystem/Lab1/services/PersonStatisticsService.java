@@ -19,11 +19,11 @@ public class PersonStatisticsService {
     private PersonRepository personRepository;
 
     public BigDecimal getAverageHeight() {
-        List<Person> persons = personRepository.findAll();
-        if (persons.isEmpty()) {
+        List<Person> people = personRepository.findAll();
+        if (people.isEmpty()) {
             throw new NotFoundException("объектов нет");
         }
-        double result =  persons.stream()
+        double result =  people.stream()
                 .mapToDouble(Person::getHeight)
                 .average()
                 .orElse(0.0);
@@ -32,11 +32,11 @@ public class PersonStatisticsService {
     }
 
     public PersonDTO getPersonWithMaxBirthday() {
-        List<Person> persons = personRepository.findAll();
-        if (persons.isEmpty()) {
+        List<Person> people = personRepository.findAll();
+        if (people.isEmpty()) {
             throw new NotFoundException("Объектов нет");
         }
-        Person person = persons.stream()
+        Person person = people.stream()
                 .max(Comparator.comparing(Person::getBirthday))
                 .orElseThrow(() -> new NotFoundException("Объектов нет"));
         return PersonDTO.map(person);
@@ -55,12 +55,12 @@ public class PersonStatisticsService {
     }
 
     public long countByHairColor(String hairColor) {
-        List<Person> persons = personRepository.findAll();
-        if (persons.isEmpty()) {
+        List<Person> people = personRepository.findAll();
+        if (people.isEmpty()) {
             throw new NotFoundException("объектов нет");
         }
         Color color = Color.valueOf(hairColor);
-        return persons.stream()
+        return people.stream()
                 .filter(p -> p.getHairColor().equals(color))
                 .count();
     }
@@ -74,12 +74,12 @@ public class PersonStatisticsService {
             double zMin,
             double zMax
     ) {
-        List<Person> persons = personRepository.findAll();
-        if (persons.isEmpty()) {
+        List<Person> people = personRepository.findAll();
+        if (people.isEmpty()) {
             throw new NotFoundException("объектов нет");
         }
         Color color = Color.valueOf(hairColor);
-        return persons.stream()
+        return people.stream()
                 .filter(p -> p.getHairColor().equals(color) &&
                         p.getLocation() != null &&
                         p.getLocation().getX() >= xMin &&
