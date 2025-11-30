@@ -4,8 +4,8 @@ import infs.lab.db.entities.Person;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -23,9 +23,9 @@ public class PersonDTO {
     private String nationality;
     private LocalDate creationDate = LocalDate.now();
 
-    public void setBirthday(String birthday) {
-        if (birthday != null && !birthday.trim().isEmpty()) {
-            this.birthday = LocalDate.parse(birthday);
+    public void setBirthday(Optional<String> birthday) {
+        if (birthday.isPresent()) {
+            this.birthday = LocalDate.parse(birthday.get());
         }
     }
 

@@ -58,7 +58,7 @@ public class PersonService {
 
         personCreator.createPerson(
                 personDTO,
-                null,
+                /* id */ null,
                 LocalDate.now(clock)
         );
     }

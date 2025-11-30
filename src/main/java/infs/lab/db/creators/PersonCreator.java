@@ -82,7 +82,7 @@ public class PersonCreator {
             List<PersonDTO> peopleDTO
     ) {
         List<Person> people = peopleDTO.stream()
-                .map(personDTO -> map(personDTO, null, LocalDate.now(clock)))
+                .map(personDTO -> map(personDTO, /* id */ null, LocalDate.now(clock)))
                 .collect(Collectors.toList());
         return personRepository.saveAll(people);
     }
