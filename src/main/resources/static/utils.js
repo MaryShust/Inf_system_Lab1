@@ -39,7 +39,7 @@ function loadCoordinates(coordinateSelect) {
             return response.json();
         })
         .then(coordinates => {
-            coordinateSelect.innerHTML = ''; // Очистка текущих опций
+            coordinateSelect.innerHTML = '';
 
             coordinates.forEach(coordinate => {
                 const option = document.createElement('option');
