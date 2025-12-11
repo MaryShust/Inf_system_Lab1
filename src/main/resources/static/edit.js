@@ -135,7 +135,7 @@ document.getElementById('edit-modal-button').addEventListener('click', () => {
 
     const url = `/update_person?id=${editPersonId}`;
     fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },

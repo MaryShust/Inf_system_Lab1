@@ -25,7 +25,9 @@ function deletePerson(id) {
     const url = `/delete_person?id=${id}`;
     const deleteMessage = document.getElementById('delete-message');
 
-    fetch(url)
+    fetch(url, {
+        method: 'DELETE'
+    })
         .then(response => {
             if (response.ok) {
                 // Успешное удаление

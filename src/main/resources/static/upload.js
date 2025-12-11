@@ -17,14 +17,12 @@ document.getElementById('upload-button').addEventListener('click', () => {
         }
     });
 
-    // Запускаем диалог выбора файла
     fileInput.click();
 });
 
 function processFile(file) {
     const uploadMessage = document.getElementById('upload-message');
 
-    // Проверяем расширение файла
     if (!file.name.toLowerCase().endsWith('.txt') && !file.name.toLowerCase().endsWith('.json')) {
         uploadMessage.textContent = "Выберите файл с расширением .txt или .json";
         uploadMessage.className = "upload-message error";
@@ -38,10 +36,8 @@ function processFile(file) {
         try {
             const fileContent = e.target.result;
 
-            // Пытаемся распарсить JSON
             const personsData = JSON.parse(fileContent);
 
-            // Проверяем, что это массив
             if (!Array.isArray(personsData)) {
                 throw new Error("Файл должен содержать массив объектов");
             }
@@ -103,9 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Найти вкладку "Другое"
     const otherTab = document.querySelector('[data-tab="upload"]');
 
-    // Добавить обработчик клика
     otherTab.addEventListener("click", function () {
-        // Проверить, активна ли вкладка (если нужно)
         if (!otherTab.classList.contains("active")) return;
 
         updateUploadTable();
