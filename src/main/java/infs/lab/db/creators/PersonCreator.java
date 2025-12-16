@@ -64,6 +64,7 @@ public class PersonCreator {
         person.setBirthday(personDTO.getBirthday().atStartOfDay());
         person.setNationality(Country.fromTranslation(personDTO.getNationality()));
         person.setCreationDate(creationDate);
+        person.setPhotoId(personDTO.getPhotoId());
 
         return person;
     }

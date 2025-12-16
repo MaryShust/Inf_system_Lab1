@@ -9,12 +9,16 @@ import org.antlr.v4.runtime.misc.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cache;
 
 @Entity
 @Table(name = "persons")
 @Getter
 @Setter
 @ToString
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Person {
 
     @Id
@@ -59,6 +63,9 @@ public class Person {
     @NotNull
     @Enumerated(EnumType.STRING)
     private Country nationality;
+
+    @Column(name = "photo_id")
+    private String photoId;
 
     public void setName(@NotNull String name) {
         if (name.isEmpty()) {

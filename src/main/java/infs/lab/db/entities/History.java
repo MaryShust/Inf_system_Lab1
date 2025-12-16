@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cache;
 
 @Entity
 @Table(name = "history")
 @Getter
 @Setter
 @ToString
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class History {
 
     @Id
@@ -25,4 +29,13 @@ public class History {
 
     @Column(name = "count_items")
     private int countItems;
+
+    @Column(name = "original_filename")
+    private String originalFilename;
+
+    @Column(name = "file_object_name")
+    private String fileObjectName;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 }

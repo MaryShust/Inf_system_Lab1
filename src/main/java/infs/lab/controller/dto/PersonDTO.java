@@ -47,6 +47,9 @@ public class PersonDTO {
     @Schema(description = "Дата создания", example = "2024-01-01", required = true)
     private LocalDate creationDate = LocalDate.now();
 
+    @Schema(description = "Id фото")
+    private String photoId;
+
     public void setBirthday(Optional<String> birthday) {
         if (birthday.isPresent()) {
             this.birthday = LocalDate.parse(birthday.get());
@@ -65,6 +68,7 @@ public class PersonDTO {
         personDTO.birthday = person.getBirthday().toLocalDate();
         personDTO.nationality = person.getNationality().getTranslation();
         personDTO.creationDate = person.getCreationDate();
+        personDTO.photoId = person.getPhotoId();
         return personDTO;
     }
 }

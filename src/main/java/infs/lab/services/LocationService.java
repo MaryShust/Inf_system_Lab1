@@ -1,5 +1,6 @@
 package infs.lab.services;
 
+import infs.lab.aop.CacheLogging;
 import infs.lab.db.entities.Location;
 import infs.lab.db.repositories.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ public class LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
+    @CacheLogging
     public List<Location> getAllLocations() {
         return locationRepository.findAll();
     }

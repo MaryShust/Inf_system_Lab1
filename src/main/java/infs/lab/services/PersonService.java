@@ -1,7 +1,9 @@
 package infs.lab.services;
 
+import infs.lab.aop.CacheLogging;
 import infs.lab.controller.dto.PersonDTO;
 import infs.lab.controller.exception.NotFoundException;
+import infs.lab.controller.exception.ParsingException;
 import infs.lab.controller.exception.ValidationException;
 import infs.lab.db.creators.PersonCreator;
 import infs.lab.db.entities.Coordinates;
@@ -10,12 +12,13 @@ import infs.lab.db.entities.Person;
 import infs.lab.db.repositories.CoordinatesRepository;
 import infs.lab.db.repositories.LocationRepository;
 import infs.lab.db.repositories.PersonRepository;
+import infs.lab.helper.FileParser;
 import infs.lab.helper.Validation;
 import infs.lab.controller.exception.UniqueViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -29,6 +32,7 @@ public class PersonService {
     private final LocationRepository locationRepository;
     private final CoordinatesRepository coordinatesRepository;
     private final Clock clock;
+    private final FileParser fileParser;
 
     @Autowired
     public PersonService(
@@ -36,21 +40,19 @@ public class PersonService {
             PersonRepository personRepository,
             LocationRepository locationRepository,
             CoordinatesRepository coordinatesRepository,
-            Clock clock
+            Clock clock,
+            FileParser fileParser
     ) {
         this.personCreator = personCreator;
         this.personRepository = personRepository;
         this.locationRepository = locationRepository;
         this.coordinatesRepository = coordinatesRepository;
         this.clock = clock;
+        this.fileParser = fileParser;
     }
 
     @Transactional
     public void createPerson(PersonDTO personDTO) {
-        if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
-            throw new UniqueViolationException("Объект должен быть уникальным по имени и росту");
-        }
-
         String validationResult = Validation.validation(personDTO);
         if (validationResult != null) {
             throw new ValidationException(validationResult);
@@ -64,8 +66,11 @@ public class PersonService {
     }
 
     @Transactional
-    public int uploadPeople(String author, List<PersonDTO> peopleDTO) throws IllegalArgumentException {
+    public int uploadPeople(MultipartFile file) {
         try {
+            String content = new String(file.getBytes());
+            List<PersonDTO> peopleDTO = fileParser.parseFileContent(content);
+
             peopleDTO.stream()
                     .forEach(personDTO -> {
                         boolean isDuplicate = personRepository.findByNameAndHeightWithLock(
@@ -88,7 +93,7 @@ public class PersonService {
             List<Person> people = personCreator.createPeople(peopleDTO);
             return people.size();
         } catch(Exception ex) {
-            throw new IllegalArgumentException(ex.getMessage());
+            throw new ParsingException(ex.getMessage());
         }
     }
 
@@ -97,7 +102,11 @@ public class PersonService {
         personRepository.findByIdWithLock(personDTO.getId())
                 .orElseThrow(() -> new NotFoundException("Объекта с таким ID не существует"));
 
-        if (!personRepository.findByNameAndHeightWithLock(personDTO.getName(), personDTO.getHeight()).get().isEmpty()) {
+        if (!personRepository.findOtherPeopleWithNameAndHeightWithLock(
+                personDTO.getId(),
+                personDTO.getName(),
+                personDTO.getHeight()
+        ).get().isEmpty()) {
             throw new UniqueViolationException("Объект должен быть уникальным по имени и росту");
         }
 
@@ -112,6 +121,7 @@ public class PersonService {
         );
     }
 
+    @CacheLogging
     @Transactional(readOnly = true)
     public PersonDTO findPerson(Long id) {
         Person person = personRepository.findById(id)
@@ -141,6 +151,7 @@ public class PersonService {
         }
     }
 
+    @CacheLogging
     public List<PersonDTO> getPeople(int page, String sortField, String sortOrder, String search) {
         List<Person> people = filterPeople(search);
 
@@ -161,6 +172,7 @@ public class PersonService {
                 .toList();
     }
 
+    @CacheLogging
     public int getTotalPages(String search) {
         List<Person> people = filterPeople(search);
         return (int) Math.ceil((double) people.size() / 10);

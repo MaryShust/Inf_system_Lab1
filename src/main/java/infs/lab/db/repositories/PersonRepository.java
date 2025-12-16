@@ -17,5 +17,16 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Person p WHERE p.name = :name AND p.height = :height")
-    Optional<List<Person>> findByNameAndHeightWithLock(@Param("name") String name, @Param("height") int height);
+    Optional<List<Person>> findByNameAndHeightWithLock(
+            @Param("name") String name,
+            @Param("height") int height
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Person p WHERE p.id != :id AND p.name = :name AND p.height = :height")
+    Optional<List<Person>> findOtherPeopleWithNameAndHeightWithLock(
+            @Param("id") Long id,
+            @Param("name") String name,
+            @Param("height") int height
+    );
 }
