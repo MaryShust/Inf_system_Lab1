@@ -4,6 +4,8 @@ import infs.lab.config.MinioConfig;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class MinioService {
 
@@ -23,20 +26,26 @@ public class MinioService {
     @Autowired
     private MinioConfig minioConfig;
 
-    public void ensureBucketExists() {
+    @PostConstruct
+    public void init() {
         try {
-            boolean found = minioClient.bucketExists(BucketExistsArgs.builder()
+            boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder()
                     .bucket(minioConfig.getBucketName())
-                    .build());
+                    .build()
+            );
 
-            if (!found) {
+            if (!bucketExists) {
                 minioClient.makeBucket(MakeBucketArgs.builder()
                         .bucket(minioConfig.getBucketName())
-                        .build());
-                System.out.println("Bucket создан успешно");
+                        .build()
+                );
+
+                log.info("Bucket создан успешно");
+            } else {
+                log.info("Bucket уже создан");
             }
         } catch (Exception e) {
-            System.out.println("Ошибка при проверке/создании бакета: " + e.getMessage());
+            log.error("Ошибка при проверке/создании бакета: " + e.getMessage());
         }
     }
 
@@ -44,7 +53,6 @@ public class MinioService {
             ServerException, InsufficientDataException, ErrorResponseException,
             NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
             XmlParserException, InternalException {
-        ensureBucketExists();
 
         String originalFilename = file.getOriginalFilename();
         String fileExtension = "";
@@ -52,10 +60,8 @@ public class MinioService {
             fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
-        // Генерируем уникальное имя файла
         String objectName = UUID.randomUUID() + fileExtension;
 
-        // Определяем content type
         String contentType = file.getContentType();
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -72,7 +78,7 @@ public class MinioService {
             );
         }
 
-        System.out.println("Файл загружен в MinIO");
+        log.info("Файл загружен в MinIO");
         return objectName;
     }
 
@@ -108,7 +114,7 @@ public class MinioService {
                         .object(objectName)
                         .build()
         );
-        System.out.println("Файл удален из MinIO");
+        log.info("Файл удален из MinIO");
     }
 
     public boolean fileExists(String objectName) {
@@ -138,7 +144,6 @@ public class MinioService {
             return null;
         }
 
-        // Используем оригинальное имя файла для скачивания
         String filename = (originalFilename != null && !originalFilename.trim().isEmpty())
                 ? originalFilename
                 : objectName;
