@@ -1,15 +1,12 @@
 document.getElementById('upload-button').addEventListener('click', () => {
     const uploadMessage = document.getElementById('upload-message');
 
-    // Очистка сообщений
     uploadMessage.style.display = "none";
 
-    // Создаем input элемент для выбора файла
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.txt,.json';
 
-    // Обработчик выбора файла
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -17,14 +14,12 @@ document.getElementById('upload-button').addEventListener('click', () => {
         }
     });
 
-    // Запускаем диалог выбора файла
     fileInput.click();
 });
 
 function processFile(file) {
     const uploadMessage = document.getElementById('upload-message');
 
-    // Проверяем расширение файла
     if (!file.name.toLowerCase().endsWith('.txt') && !file.name.toLowerCase().endsWith('.json')) {
         uploadMessage.textContent = "Выберите файл с расширением .txt или .json";
         uploadMessage.className = "upload-message error";
@@ -78,9 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Найти вкладку "Другое"
     const otherTab = document.querySelector('[data-tab="upload"]');
 
-    // Добавить обработчик клика
     otherTab.addEventListener("click", function () {
-        // Проверить, активна ли вкладка (если нужно)
         if (!otherTab.classList.contains("active")) return;
 
         updateUploadTable();
@@ -94,14 +87,12 @@ function updateUploadTable() {
             const tableBody = document.getElementById('upload-table-body');
             const uploadTable = document.getElementById('upload-table');
 
-            // Проверяем, есть ли данные
             if (!data || data.length === 0) {
                 if (uploadTable) uploadTable.style.display = 'none';
                 tableBody.innerHTML = '';
                 return;
             }
 
-            // Показываем таблицу, скрываем сообщение
             if (uploadTable) uploadTable.style.display = 'table';
 
             tableBody.innerHTML = '';
@@ -110,7 +101,6 @@ function updateUploadTable() {
                 const statusText = upload.status ? 'Успешно' : 'Неуспешно';
                 const statusClass = upload.status ? 'success' : 'error';
 
-                // Создаем кнопку для скачивания файла, если есть URL
                 let downloadButton = '';
                 if (upload.downloadUrl && upload.originalFilename) {
                     downloadButton = `
@@ -149,7 +139,6 @@ function downloadFile(url, filename) {
 
     // Добавляем обработчик события load для удаления ссылки после скачивания
     link.onload = function() {
-        // Небольшая задержка перед удалением
         setTimeout(() => {
             if (link.parentNode) {
                 link.parentNode.removeChild(link);
@@ -157,7 +146,6 @@ function downloadFile(url, filename) {
         }, 100);
     };
 
-    // Добавляем обработчик ошибок
     link.onerror = function() {
         console.error('Ошибка при скачивании файла');
         alert('Не удалось скачать файл');
@@ -166,7 +154,6 @@ function downloadFile(url, filename) {
         }
     };
 
-    // Добавляем ссылку в DOM и кликаем по ней
     document.body.appendChild(link);
     link.click();
 }

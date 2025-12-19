@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
+@Slf4j
 @Tag(name = "History Controller", description = "API для получения истории импортов из файла")
 public class HistoryController {
 
@@ -76,11 +78,13 @@ public class HistoryController {
             fileSize = file.getSize();
         } catch (Exception e) {
             failUploadFile = true;
+            log.error("Ошибка при загрузке файла в MinIO: {}", e.getMessage());
         }
         try {
             countPeople = personService.uploadPeople(file);
         } catch (ValidationException | UniqueViolationException | ParsingException e) {
             failUpdateDB = true;
+            log.error("Ошибка при загрузке объектов: {}", e.getMessage());
         }
         if (!failUploadFile && !failUpdateDB) {
             historyService.updateHistory(
@@ -104,18 +108,18 @@ public class HistoryController {
             historyService.updateHistory(
                     userName,
                     countPeople,
-                    null,
-                    null,
-                    null
+                    /* имя файла */null,
+                    /* имя файла в MinIO */null,
+                    /* размер файла */null
             );
             return ResponseEntity.ok("Данные загружены, однако файл не загружен");
         } else {
             historyService.updateHistory(
                     userName,
-                    0,
-                    null,
-                    null,
-                    null
+                    /* количество обьектов */0,
+                    /* имя файла */null,
+                    /* имя файла в MinIO */null,
+                    /* размер файла */null
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ничего не загружено");
         }

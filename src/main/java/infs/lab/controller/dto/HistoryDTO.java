@@ -27,6 +27,7 @@ public record HistoryDTO(
                 );
             } catch (Exception ignored) {}
         }
+
         return new HistoryDTO(
                 history.getId(),
                 history.isStatus(),
