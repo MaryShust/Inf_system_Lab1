@@ -3,14 +3,12 @@ package infs.lab.db.entities;
 import infs.lab.controller.exception.ValidationException;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.ToString;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cache;
 
 @Entity
 @Table(name = "coordinates")
 @Getter
-@ToString
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Coordinates {
