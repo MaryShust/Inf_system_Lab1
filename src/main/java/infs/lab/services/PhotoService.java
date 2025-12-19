@@ -30,7 +30,7 @@ public class PhotoService {
 
         PersonDTO personDTO = personService.findPerson(id);
 
-        String oldPhotoId = personDTO.getPhotoId();
+        String oldPhotoId = personDTO.photoId();
         if (oldPhotoId != null && !oldPhotoId.trim().isEmpty()) {
             try {
                 minioService.deleteFile(oldPhotoId);
@@ -40,8 +40,19 @@ public class PhotoService {
         }
 
         String newPhotoId = minioService.uploadFile(file);
-        personDTO.setPhotoId(newPhotoId);
-        personService.updatePerson(personDTO);
+        personService.updatePerson(new PersonDTO(
+                personDTO.id(),
+                personDTO.name(),
+                personDTO.coordinates(),
+                personDTO.eyeColor(),
+                personDTO.hairColor(),
+                personDTO.location(),
+                personDTO.height(),
+                personDTO.birthday(),
+                personDTO.nationality(),
+                personDTO.creationDate(),
+                newPhotoId
+        ));
 
         String photoUrl = minioService.getFileUrl(newPhotoId);
         return new PhotoResponse("Фото успешно загружено", newPhotoId, photoUrl);
@@ -71,7 +82,7 @@ public class PhotoService {
 
         PersonDTO personDTO = personService.findPerson(id);
 
-        String oldPhotoId = personDTO.getPhotoId();
+        String oldPhotoId = personDTO.photoId();
         if (oldPhotoId != null && !oldPhotoId.trim().isEmpty()) {
             try {
                 minioService.deleteFile(oldPhotoId);
@@ -80,8 +91,21 @@ public class PhotoService {
             }
         }
 
-        personDTO.setPhotoId(null);
-        personService.updatePerson(personDTO);
+        personService.updatePerson(
+                new PersonDTO(
+                        personDTO.id(),
+                        personDTO.name(),
+                        personDTO.coordinates(),
+                        personDTO.eyeColor(),
+                        personDTO.hairColor(),
+                        personDTO.location(),
+                        personDTO.height(),
+                        personDTO.birthday(),
+                        personDTO.nationality(),
+                        personDTO.creationDate(),
+                        null
+                )
+        );
 
         return new PhotoResponse("Фото успешно удалено", /* photoId */ null, /* photoUrl */ null);
     }

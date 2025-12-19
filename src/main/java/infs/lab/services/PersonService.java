@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.InputStream;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -68,14 +69,14 @@ public class PersonService {
     @Transactional
     public int uploadPeople(MultipartFile file) {
         try {
-            String content = new String(file.getBytes());
-            List<PersonDTO> peopleDTO = fileParser.parseFileContent(content);
+            InputStream inputStream = file.getInputStream();
+            List<PersonDTO> peopleDTO = fileParser.parseFileContent(inputStream, file.getOriginalFilename());
 
             peopleDTO.stream()
                     .forEach(personDTO -> {
                         boolean isDuplicate = personRepository.findByNameAndHeightWithLock(
-                                        personDTO.getName(),
-                                        personDTO.getHeight()
+                                        personDTO.name(),
+                                        personDTO.height()
                                 )
                                 .get()
                                 .stream()
@@ -92,20 +93,20 @@ public class PersonService {
                     });
             List<Person> people = personCreator.createPeople(peopleDTO);
             return people.size();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw new ParsingException(ex.getMessage());
         }
     }
 
     @Transactional
     public void updatePerson(PersonDTO personDTO) {
-        personRepository.findByIdWithLock(personDTO.getId())
+        personRepository.findByIdWithLock(personDTO.id())
                 .orElseThrow(() -> new NotFoundException("Объекта с таким ID не существует"));
 
         if (!personRepository.findOtherPeopleWithNameAndHeightWithLock(
-                personDTO.getId(),
-                personDTO.getName(),
-                personDTO.getHeight()
+                personDTO.id(),
+                personDTO.name(),
+                personDTO.height()
         ).get().isEmpty()) {
             throw new UniqueViolationException("Объект должен быть уникальным по имени и росту");
         }
@@ -116,8 +117,8 @@ public class PersonService {
         }
         personCreator.createPerson(
                 personDTO,
-                personDTO.getId(),
-                personDTO.getCreationDate()
+                personDTO.id(),
+                personDTO.creationDate()
         );
     }
 
@@ -140,12 +141,10 @@ public class PersonService {
 
         personRepository.deleteById(id);
 
-        // Проверяем и удаляем Location, если больше не используется
         if (locationId != null) {
             locationRepository.deleteIfUnused(locationId);
         }
 
-        // Проверяем и удаляем Coordinates, если больше не используется
         if (coordinatesId != null) {
             coordinatesRepository.deleteIfUnused(coordinatesId);
         }

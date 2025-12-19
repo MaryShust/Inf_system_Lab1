@@ -42,29 +42,29 @@ public class PersonCreator {
         Double locationX = null;
         Float locationY = null;
         Double locationZ = null;
-        if (personDTO.getLocation() != null) {
-            locationX = personDTO.getLocation().getX();
-            locationY = personDTO.getLocation().getY();
-            locationZ = personDTO.getLocation().getZ();
+        if (personDTO.location() != null) {
+            locationX = personDTO.location().x();
+            locationY = personDTO.location().y();
+            locationZ = personDTO.location().z();
         }
 
         Person person = new Person();
         person.setId(id);
-        person.setName(personDTO.getName());
+        person.setName(personDTO.name());
         person.setCoordinates(
                 coordinatesCreator.createCoordinates(
-                        personDTO.getCoordinates().getX(),
-                        personDTO.getCoordinates().getY()
+                        personDTO.coordinates().x(),
+                        personDTO.coordinates().y()
                 )
         );
-        person.setEyeColor(Color.fromTranslation(personDTO.getEyeColor()));
-        person.setHairColor(Color.fromTranslation(personDTO.getHairColor()));
+        person.setEyeColor(Color.fromTranslation(personDTO.eyeColor()));
+        person.setHairColor(Color.fromTranslation(personDTO.hairColor()));
         person.setLocation(locationCreator.createLocation(locationX, locationY, locationZ));
-        person.setHeight(personDTO.getHeight());
-        person.setBirthday(personDTO.getBirthday().atStartOfDay());
-        person.setNationality(Country.fromTranslation(personDTO.getNationality()));
+        person.setHeight(personDTO.height());
+        person.setBirthday(personDTO.birthday().atStartOfDay());
+        person.setNationality(Country.fromTranslation(personDTO.nationality()));
         person.setCreationDate(creationDate);
-        person.setPhotoId(personDTO.getPhotoId());
+        person.setPhotoId(personDTO.photoId());
 
         return person;
     }

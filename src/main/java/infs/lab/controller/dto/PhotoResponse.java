@@ -1,16 +1,12 @@
 package infs.lab.controller.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class PhotoResponse {
-    private String message;
-    private String photoId;
-    private String photoUrl;
+@Schema(description = "Ответ с информацией о фотографии")
+public record PhotoResponse(
+        @Schema(description = "Сообщение о результате операции") String message,
+        @Schema(description = "Идентификатор фотографии") String photoId,
+        @Schema(description = "URL фотографии") String photoUrl
+) {
+
 }

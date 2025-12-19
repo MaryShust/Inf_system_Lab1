@@ -3,61 +3,40 @@ package infs.lab.controller.dto;
 import infs.lab.db.entities.History;
 import infs.lab.services.MinioService;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.text.DecimalFormat;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(description = "История")
-public class HistoryDTO {
-
-    @Schema(description = "Id истории")
-    private Long id;
-
-    @Schema(description = "Статус")
-    private boolean status;
-
-    @Schema(description = "Автор")
-    private String author;
-
-    @Schema(description = "Количество загруженных людей")
-    private int countItems;
-
-    @Schema(description = "Имя файла")
-    private String originalFilename;
-
-    @Schema(description = "Url для скачивания файла")
-    private String downloadUrl;
-
-    @Schema(description = "Размер файла")
-    private Long fileSize;
-
-    @Schema(description = "Отформатированный размер файла")
-    private String formattedFileSize;
+public record HistoryDTO(
+        @Schema(description = "Id истории") Long id,
+        @Schema(description = "Статус") boolean status,
+        @Schema(description = "Автор") String author,
+        @Schema(description = "Количество загруженных людей") int countItems,
+        @Schema(description = "Имя файла") String originalFilename,
+        @Schema(description = "Url для скачивания файла") String downloadUrl,
+        @Schema(description = "Размер файла") Long fileSize,
+        @Schema(description = "Отформатированный размер файла") String formattedFileSize
+) {
 
     public static HistoryDTO map(History history, MinioService minioService) {
-        HistoryDTO historyDTO = new HistoryDTO();
-        historyDTO.id = history.getId();
-        historyDTO.status = history.isStatus();
-        historyDTO.author = history.getAuthor();
-        historyDTO.countItems = history.getCountItems();
-        historyDTO.originalFilename = history.getOriginalFilename();
-        historyDTO.fileSize = history.getFileSize();
-        historyDTO.formattedFileSize = formatFileSize(history.getFileSize());
+        String downloadUrl = null;
         if (history.getFileObjectName() != null) {
             try {
-                historyDTO.downloadUrl = minioService.getFileDownloadUrl(
+                downloadUrl = minioService.getFileDownloadUrl(
                         history.getFileObjectName(),
                         history.getOriginalFilename()
                 );
-            } catch (Exception e) {
-                historyDTO.downloadUrl = null;
-            }
+            } catch (Exception ignored) {}
         }
-        return historyDTO;
+        return new HistoryDTO(
+                history.getId(),
+                history.isStatus(),
+                history.getAuthor(),
+                history.getCountItems(),
+                history.getOriginalFilename(),
+                downloadUrl,
+                history.getFileSize(),
+                formatFileSize(history.getFileSize())
+        );
     }
 
     private static String formatFileSize(Long bytes) {

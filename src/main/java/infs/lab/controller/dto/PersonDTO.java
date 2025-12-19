@@ -1,74 +1,56 @@
 package infs.lab.controller.dto;
 
 import infs.lab.db.entities.Person;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import java.time.LocalDate;
-import java.util.Optional;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Getter
-@Setter
-@ToString
 @Schema(description = "Человек")
-public class PersonDTO {
+public record PersonDTO(
 
-    @Schema(description = "ID человека", example = "1")
-    private Long id;
+    @Schema(description = "ID человека", example = "1") Long id,
 
-    @Schema(description = "Имя", example = "Иван Иванов", required = true)
-    private String name;
+    @Schema(description = "Имя", example = "Иван Иванов", required = true) String name,
 
-    @Schema(description = "Координаты", required = true)
-    private CoordinatesDTO coordinates;
+    @Schema(description = "Координаты", required = true) CoordinatesDTO coordinates,
 
     @Schema(description = "Цвет глаз", example = "Синий",
             allowableValues = {"Черный", "Синий", "Желтый", "Оранжевый", "Белый"})
-    private String eyeColor;
+    String eyeColor,
 
     @Schema(description = "Цвет волос", example = "Черный", required = true,
             allowableValues = {"Черный", "Синий", "Желтый", "Оранжевый", "Белый"})
-    private String hairColor;
+    String hairColor,
 
-    @Schema(description = "Локация")
-    private LocationDTO location;
+    @Schema(description = "Локация") LocationDTO location,
 
-    @Schema(description = "Рост", example = "180", minimum = "1")
-    private int height;
+    @Schema(description = "Рост", example = "180", minimum = "1") int height,
 
     @Schema(description = "Дата рождения", example = "1990-01-15", required = true)
-    private LocalDate birthday;
+    LocalDate birthday,
 
     @Schema(description = "Национальность", example = "Германия", required = true,
             allowableValues = {"Германия", "Испания", "Ватикан", "Северная Корея", "Япония"})
-    private String nationality;
+    String nationality,
 
     @Schema(description = "Дата создания", example = "2024-01-01", required = true)
-    private LocalDate creationDate = LocalDate.now();
+    LocalDate creationDate,
 
-    @Schema(description = "Id фото")
-    private String photoId;
-
-    public void setBirthday(Optional<String> birthday) {
-        if (birthday.isPresent()) {
-            this.birthday = LocalDate.parse(birthday.get());
-        }
-    }
+    @Schema(description = "Id фото") String photoId
+) {
 
     public static PersonDTO map(Person person) {
-        PersonDTO personDTO = new PersonDTO();
-        personDTO.id = person.getId();
-        personDTO.name = person.getName();
-        personDTO.coordinates = CoordinatesDTO.map(person.getCoordinates());
-        personDTO.eyeColor = person.getEyeColor().getTranslation();
-        personDTO.hairColor = person.getHairColor().getTranslation();
-        personDTO.location = LocationDTO.map(person.getLocation());
-        personDTO.height = person.getHeight();
-        personDTO.birthday = person.getBirthday().toLocalDate();
-        personDTO.nationality = person.getNationality().getTranslation();
-        personDTO.creationDate = person.getCreationDate();
-        personDTO.photoId = person.getPhotoId();
-        return personDTO;
+        return new PersonDTO(
+                person.getId(),
+                person.getName(),
+                CoordinatesDTO.map(person.getCoordinates()),
+                person.getEyeColor().getTranslation(),
+                person.getHairColor().getTranslation(),
+                LocationDTO.map(person.getLocation()),
+                person.getHeight(),
+                person.getBirthday().toLocalDate(),
+                person.getNationality().getTranslation(),
+                person.getCreationDate(),
+                person.getPhotoId()
+        );
     }
 }
