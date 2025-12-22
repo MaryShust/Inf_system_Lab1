@@ -16,12 +16,18 @@ public class HistoryCreator {
     public History createHistory(
             boolean status,
             String author,
-            int countItems
+            int countItems,
+            String originalFilename,
+            String fileObjectName,
+            Long fileSize
     ) {
         History history = new History();
         history.setStatus(status);
         history.setAuthor(author);
         history.setCountItems(countItems);
+        history.setOriginalFilename(originalFilename);
+        history.setFileObjectName(fileObjectName);
+        history.setFileSize(fileSize);
         return historyRepository.save(history);
     }
 }

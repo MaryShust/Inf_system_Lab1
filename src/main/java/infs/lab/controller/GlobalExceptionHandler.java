@@ -3,12 +3,17 @@ package infs.lab.controller;
 import infs.lab.controller.exception.NotFoundException;
 import infs.lab.controller.exception.UniqueViolationException;
 import infs.lab.controller.exception.ValidationException;
+import infs.lab.controller.exception.WorkWithPhotoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(WorkWithPhotoException.class)
+    public ResponseEntity<String> handleValidationException(WorkWithPhotoException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<String> handleValidationException(ValidationException ex) {

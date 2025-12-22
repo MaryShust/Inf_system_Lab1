@@ -1,5 +1,6 @@
 package infs.lab.services;
 
+import infs.lab.aop.CacheLogging;
 import infs.lab.db.entities.Color;
 import infs.lab.db.entities.Person;
 import infs.lab.db.repositories.PersonRepository;
@@ -18,6 +19,7 @@ public class PersonStatisticsService {
     @Autowired
     private PersonRepository personRepository;
 
+    @CacheLogging
     public BigDecimal getAverageHeight() {
         List<Person> people = personRepository.findAll();
         if (people.isEmpty()) {
@@ -31,6 +33,7 @@ public class PersonStatisticsService {
                 .setScale(3, RoundingMode.HALF_UP);
     }
 
+    @CacheLogging
     public PersonDTO getPersonWithMaxBirthday() {
         List<Person> people = personRepository.findAll();
         if (people.isEmpty()) {
@@ -42,6 +45,7 @@ public class PersonStatisticsService {
         return PersonDTO.map(person);
     }
 
+    @CacheLogging
     public List<PersonDTO> getTallPeople(int minHeight) {
         List<PersonDTO> result = personRepository.findAll()
                 .stream()
@@ -54,6 +58,7 @@ public class PersonStatisticsService {
         return result;
     }
 
+    @CacheLogging
     public long countByHairColor(String hairColor) {
         List<Person> people = personRepository.findAll();
         if (people.isEmpty()) {
@@ -65,6 +70,7 @@ public class PersonStatisticsService {
                 .count();
     }
 
+    @CacheLogging
     public long countByHairColorInLocation(
             String hairColor,
             double xMin,

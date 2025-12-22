@@ -104,10 +104,300 @@ function updatePersonsTable() {
                     <td>${person.location?.y ?? "-"}</td>
                     <td>${person.location?.z ?? "-"}</td>
                     <td>${person.creationDate}</td>
+                    <td class="photo-cell" data-person-id="${person.id}">
+                        <div class="photo-container" id="photo-container-${person.id}">
+                            <!-- Будет заполнено динамически -->
+                        </div>
+                    </td>
                 `;
                 tableBody.appendChild(row);
+                loadPersonPhoto(person.id, person.photoId);
+            });
+
+            // Добавляем обработчики событий для загрузки фото
+            document.querySelectorAll('.photo-cell').forEach(cell => {
+                const personId = cell.getAttribute('data-person-id');
+                const container = document.getElementById(`photo-container-${personId}`);
+
+                // Показываем иконку загрузки если фото еще не загружено
+                if (!container.querySelector('.photo-loaded')) {
+                    container.innerHTML = `
+                        <div class="upload-icon" title="Загрузить фото" onclick="openPhotoUploadModal(${personId})">
+                            📤
+                        </div>
+                        <div class="photo-preview" id="photo-preview-${personId}"></div>
+                    `;
+                }
             });
         });
+}
+
+function loadPersonPhoto(personId, photoId) {
+    const container = document.getElementById(`photo-container-${personId}`);
+    const preview = document.getElementById(`photo-preview-${personId}`);
+
+    if (!container) return;
+
+    if (!photoId) {
+        // Если photoId не пришел - показываем иконку загрузки
+        container.innerHTML = `
+            <div class="upload-icon" title="Загрузить фото" onclick="openPhotoUploadModal(${personId})">
+                📤
+            </div>
+            <div class="photo-preview" id="photo-preview-${personId}"></div>
+        `;
+        return;
+    }
+
+    // Если photoId есть - загружаем фото
+    fetch(`/persons/photo/${photoId}`)
+        .then(response => response.json())
+        .then(photoData => {
+            if (photoData && photoData.photoUrl) {
+                // Помечаем контейнер как загруженный
+                container.classList.add('photo-loaded');
+
+                container.innerHTML = `
+                    <div class="photo-loaded-content">
+                        <img src="${photoData.photoUrl}"
+                             alt="Фото ${personId}"
+                             class="person-photo"
+                             onclick="openPhotoViewer('${photoData.photoUrl}')">
+                        <div class="photo-actions">
+                            <button onclick="deletePhoto(${personId})"
+                                    class="delete-photo-btn"
+                                    title="Удалить фото">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Если фото не найдено - показываем иконку загрузки
+                container.innerHTML = `
+                    <div class="upload-icon" title="Загрузить фото" onclick="openPhotoUploadModal(${personId})">
+                        📤
+                    </div>
+                    <div class="photo-preview" id="photo-preview-${personId}"></div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading photo:', error);
+            // При ошибке показываем иконку загрузки
+            container.innerHTML = `
+                <div class="upload-icon" title="Загрузить фото" onclick="openPhotoUploadModal(${personId})">
+                    📤
+                </div>
+                <div class="photo-preview" id="photo-preview-${personId}"></div>
+            `;
+        });
+}
+
+function openPhotoUploadModal(personId) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'photo-upload-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Загрузить фото для человека ID: ${personId}</h3>
+            <span class="close-modal">&times;</span>
+            <div class="upload-area" id="drop-area-${personId}">
+                <p>Перетащите фото сюда или</p>
+                <input type="file" id="file-input-${personId}" accept="image/*" style="display: none;">
+                <label for="file-input-${personId}" class="browse-btn">Выберите файл</label>
+                <p class="file-info" id="file-info-${personId}"></p>
+                <div class="preview-container" id="preview-container-${personId}"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="upload-photo-btn-${personId}" class="upload-btn" disabled>Загрузить</button>
+                <button id="cancel-btn-${personId}" class="cancel-btn">Отмена</button>
+            </div>
+            <div id="upload-status-${personId}" class="upload-status"></div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const dropArea = document.getElementById(`drop-area-${personId}`);
+    const fileInput = document.getElementById(`file-input-${personId}`);
+    const uploadBtn = document.getElementById(`upload-photo-btn-${personId}`);
+    const cancelBtn = document.getElementById(`cancel-btn-${personId}`);
+    const closeBtn = modal.querySelector('.close-modal');
+    let selectedFile = null;
+
+    // Функции для drag & drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        dropArea.classList.add('highlight');
+    }
+
+    function unhighlight() {
+        dropArea.classList.remove('highlight');
+    }
+
+    // Обработка сброса файла
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        handleFile(file);
+    }
+
+    fileInput.addEventListener('change', function(e) {
+        // Останавливаем всплытие события
+        e.stopPropagation();
+        if (this.files[0]) {
+            handleFile(this.files[0]);
+        }
+    });
+
+    // Обработчик для кнопки "Выберите файл"
+    const browseBtn = dropArea.querySelector('.browse-btn');
+    browseBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Останавливаем всплытие
+        e.preventDefault(); // Предотвращаем поведение по умолчанию
+        fileInput.click();
+    });
+
+    // Добавляем обработчик непосредственно к input для предотвращения закрытия
+    fileInput.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    function handleFile(file) {
+        if (file && file.type.startsWith('image/')) {
+            selectedFile = file;
+
+            // Показываем информацию о файле
+            document.getElementById(`file-info-${personId}`).textContent =
+                `Файл: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+
+            // Показываем предпросмотр
+            const previewContainer = document.getElementById(`preview-container-${personId}`);
+            previewContainer.innerHTML = '';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.maxWidth = '200px';
+                img.style.maxHeight = '200px';
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+
+            // Активируем кнопку загрузки
+            uploadBtn.disabled = false;
+        } else {
+            alert('Пожалуйста, выберите файл изображения (JPG, PNG, GIF)');
+        }
+    }
+
+    uploadBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!selectedFile) return;
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Загружается...';
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        try {
+            const response = await fetch(`/persons/${personId}/photo`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById(`upload-status-${personId}`).innerHTML =
+                    '<div class="success">Фото успешно загружено!</div>';
+
+                // Обновляем фото в таблице с новым photoId
+                setTimeout(() => {
+                    // Загружаем фото по новому photoId
+                    loadPersonPhoto(personId, result.photoId);
+                    closeModal();
+                }, 1500);
+            } else {
+                throw new Error(result.message || 'Ошибка загрузки');
+            }
+        } catch (error) {
+            document.getElementById(`upload-status-${personId}`).innerHTML =
+                `<div class="error">Ошибка: ${error.message}</div>`;
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Загрузить';
+        }
+    });
+
+    function closeModal() {
+        modal.remove();
+    }
+
+    cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeModal();
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeModal();
+    });
+
+    // Закрытие по клику вне модального окна
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Предотвращаем закрытие при клике внутри модального окна
+    modal.querySelector('.modal-content').addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+async function deletePhoto(personId) {
+    try {
+        const response = await fetch(`/persons/${personId}/photo`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            // После удаления показываем иконку загрузки
+            const container = document.getElementById(`photo-container-${personId}`);
+            if (container) {
+                container.innerHTML = `
+                    <div class="upload-icon" title="Загрузить фото" onclick="openPhotoUploadModal(${personId})">
+                        📤
+                    </div>
+                    <div class="photo-preview" id="photo-preview-${personId}"></div>
+                `;
+            }
+        } else {
+            throw new Error('Ошибка удаления');
+        }
+    } catch (error) {
+        alert(`Ошибка: ${error.message}`);
+    }
 }
 
 // Добавляем обработчики событий для заголовков таблицы

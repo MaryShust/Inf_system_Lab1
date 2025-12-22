@@ -1,5 +1,6 @@
 package infs.lab.services;
 
+import infs.lab.aop.CacheLogging;
 import infs.lab.db.entities.User;
 import infs.lab.db.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @CacheLogging
     @Transactional
     public Long findOrCreateUser(String name, String password) {
 

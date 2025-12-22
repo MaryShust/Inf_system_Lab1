@@ -7,68 +7,66 @@ import infs.lab.db.entities.Country;
 public class Validation {
 
     public static String validation(PersonDTO personDTO) {
-        if (personDTO.getName() == null || personDTO.getName().trim().isEmpty()) {
+        if (personDTO.name() == null || personDTO.name().trim().isEmpty()) {
             return "Имя не может быть пустым";
         }
 
-        if (personDTO.getBirthday() == null || personDTO.getBirthday().toString().isEmpty()) {
+        if (personDTO.birthday() == null || personDTO.birthday().toString().isEmpty()) {
             return "Дата рождения обязательна";
         }
 
-        if (personDTO.getNationality() == null || personDTO.getNationality().trim().isEmpty()) {
+        if (personDTO.nationality() == null || personDTO.nationality().trim().isEmpty()) {
             return "Национальность обязательна";
         }
 
-        if (personDTO.getNationality() != null && !personDTO.getNationality().trim().isEmpty() && Country.fromTranslation(personDTO.getNationality()) == null) {
+        if (Country.fromTranslation(personDTO.nationality()) == null) {
             return "Национальность строго определенных значений";
         }
 
-        if (Country.fromTranslation(personDTO.getNationality()) == Country.GERMANY &&
-                !(Color.fromTranslation(personDTO.getEyeColor()) == Color.BLUE && Color.fromTranslation(personDTO.getHairColor()) == Color.YELLOW)
+        if (Country.fromTranslation(personDTO.nationality()) == Country.GERMANY &&
+                !(Color.fromTranslation(personDTO.eyeColor()) == Color.BLUE && Color.fromTranslation(personDTO.hairColor()) == Color.YELLOW)
         ) {
             return "У немцев могут быть только блондинами с голубыми глазами";
         }
 
-        if (Country.fromTranslation(personDTO.getNationality()) == Country.JAPAN &&
-                !(personDTO.getHeight() <= 170 && Color.fromTranslation(personDTO.getEyeColor()) == Color.BLACK)
+        if (Country.fromTranslation(personDTO.nationality()) == Country.JAPAN &&
+                !(personDTO.height() <= 170 && Color.fromTranslation(personDTO.eyeColor()) == Color.BLACK)
         ) {
             return "У японцев могут быть только черные волосы и рост не выше 170";
         }
 
-        if (Country.fromTranslation(personDTO.getNationality()) == Country.SOUTH_KOREA &&
-                !(Color.fromTranslation(personDTO.getEyeColor()) == Color.BLACK && Color.fromTranslation(personDTO.getHairColor()) ==Color.BLACK)
+        if (Country.fromTranslation(personDTO.nationality()) == Country.SOUTH_KOREA &&
+                !(Color.fromTranslation(personDTO.eyeColor()) == Color.BLACK && Color.fromTranslation(personDTO.hairColor()) ==Color.BLACK)
         ) {
             return "У корейцев могут быть только черные волосы и глаза";
         }
 
-        if (personDTO.getHeight() < 1) {
+        if (personDTO.height() < 1) {
             return "Рост должен быть ≥ 1";
         }
 
-        if (personDTO.getHairColor() == null || personDTO.getHairColor().trim().isEmpty()) {
+        if (personDTO.hairColor() == null || personDTO.hairColor().trim().isEmpty()) {
             return "Цвет волос обязателен";
         }
 
-        if (personDTO.getHairColor() != null && !personDTO.getHairColor().trim().isEmpty() && Color.fromTranslation(personDTO.getHairColor()) == null) {
+        if (Color.fromTranslation(personDTO.hairColor()) == null) {
             return "Цвет волос строго определенных значений";
         }
 
-        if (personDTO.getEyeColor() != null && !personDTO.getEyeColor().trim().isEmpty() && Color.fromTranslation(personDTO.getEyeColor()) == null) {
+        if (personDTO.eyeColor() != null && !personDTO.eyeColor().trim().isEmpty() && Color.fromTranslation(personDTO.eyeColor()) == null) {
             return "Цвет глаз строго определенных значений";
         }
 
-        if (personDTO.getCoordinates() == null || personDTO.getCoordinates().getX() == null ||
-        personDTO.getCoordinates().getY() == null) {
+        if (personDTO.coordinates() == null || personDTO.coordinates().x() == null ||
+        personDTO.coordinates().y() == null) {
             return "Все координаты (X, Y) обязательны";
         }
 
-        if (personDTO.getCoordinates() != null && personDTO.getCoordinates().getX() != null &&
-                personDTO.getCoordinates().getX() > 674) {
+        if (personDTO.coordinates().x() > 674) {
             return "Координата X должна быть не больше 674";
         }
 
-        if (personDTO.getCoordinates() != null && personDTO.getCoordinates().getY() != null &&
-                personDTO.getCoordinates().getY() < -554) {
+        if (personDTO.coordinates().y() < -554) {
             return "Координата Y не должна быть меньше -554";
         }
         return null;

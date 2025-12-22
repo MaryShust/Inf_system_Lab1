@@ -1,10 +1,7 @@
 package infs.lab.controller;
 
 import infs.lab.controller.dto.PersonDTO;
-import infs.lab.controller.exception.ValidationException;
-import infs.lab.controller.exception.UniqueViolationException;
 import infs.lab.services.AuthService;
-import infs.lab.services.HistoryService;
 import infs.lab.services.PersonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,9 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +24,6 @@ public class PersonController {
     private PersonService personService;
     @Autowired
     private AuthService authService;
-    @Autowired
-    private HistoryService historyService;
 
     @Operation(
             summary = "Создать нового человека",
@@ -48,31 +41,6 @@ public class PersonController {
         return ResponseEntity.ok("Персона успешно создана");
     }
 
-    @Operation(
-            summary = "Пакетная загрузка данных людей",
-            description = "Загружает список людей из файла"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Данные людей успешно загружены",
-                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации или нарушение уникальности",
-                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE))
-    })
-    @PostMapping("/upload_from_file")
-    public ResponseEntity<?> uploadPeople(HttpServletRequest request, @RequestBody List<PersonDTO> people) {
-        String userName = authService.getUserName(request);
-        try {
-            int size = personService.uploadPeople(userName, people);
-            historyService.updateHistory(userName, size);
-            return ResponseEntity.ok("Персоны успешно загружены и созданы");
-        } catch (ValidationException | UniqueViolationException e) {
-            historyService.updateHistory(userName, 0);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception ex) {
-            historyService.updateHistory(userName, 0);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-        }
-    }
     @Operation(
             summary = "Обновить данные человека",
             description = "Обновляет данные существующего человека по ID"

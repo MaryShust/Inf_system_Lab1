@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Закрытие модального окна при клике вне контента (через backdrop)
 modal.addEventListener('click', (event) => {
-    // Проверяем, кликнули ли мы по backdrop
     if (event.target === modal) {
         modal.close();
     }
@@ -49,13 +48,11 @@ function openEditModal(personId) {
                     document.getElementById('edit_hair_color_input').value = person.hairColor || '';
                     document.getElementById('edit_eye_color_input').value = person.eyeColor || '';
 
-                    // Координаты
                     if (person.coordinates) {
                         xInputC.value = person.coordinates.x || '';
                         yInputC.value = person.coordinates.y || '';
                     }
 
-                    // Локация
                     if (person.location) {
                         xInputL.value = person.location.x || '';
                         yInputL.value = person.location.y || '';
@@ -74,7 +71,6 @@ function openEditModal(personId) {
                         if (!isNaN(z)) zInputL.value = z;
                     });
 
-                    // Обработчик выбора локации
                     coordinateSelect.addEventListener('change', () => {
                         const [x, y] = coordinateSelect.value.split(',').map(Number);
                         if (!isNaN(x)) xInputC.value = x;
@@ -96,7 +92,6 @@ document.getElementById('edit-modal-button').addEventListener('click', () => {
     if (editPersonId == null) {
         return
     }
-    // Получаем элементы формы
     const nameInput = document.getElementById('edit_name_input');
     const birthdayInput = document.getElementById('edit_birthday_input');
     const nationalitySelect = document.getElementById('edit_nationality_input');
@@ -128,7 +123,7 @@ document.getElementById('edit-modal-button').addEventListener('click', () => {
             x: parseInt(coordX.value),
             y: parseInt(coordY.value)
         },
-        creationDate: creationDate.value
+        creationDate: creationDate.textContent
     };
 
     console.log(formData);
