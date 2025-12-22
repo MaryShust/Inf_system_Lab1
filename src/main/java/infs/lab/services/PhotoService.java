@@ -5,6 +5,7 @@ import infs.lab.controller.dto.PhotoResponse;
 import infs.lab.controller.exception.NotFoundException;
 import infs.lab.controller.exception.ValidationException;
 import io.minio.errors.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,10 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import infs.lab.controller.exception.WorkWithPhotoException;
+
 @Service
+@Slf4j
 public class PhotoService {
 
     @Autowired
@@ -23,62 +27,64 @@ public class PhotoService {
     private MinioService minioService;
 
     @Transactional
-    public PhotoResponse uploadPhoto(Long id, MultipartFile file) throws ServerException,
-            InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
+    public PhotoResponse uploadPhoto(Long id, MultipartFile file) throws WorkWithPhotoException {
+        try {
+            PersonDTO personDTO = personService.findPerson(id);
 
-        PersonDTO personDTO = personService.findPerson(id);
-
-        String oldPhotoId = personDTO.photoId();
-        if (oldPhotoId != null && !oldPhotoId.trim().isEmpty()) {
-            try {
-                minioService.deleteFile(oldPhotoId);
-            } catch (Exception e) {
-                System.out.println("Не удалось удалить старое фото: " + e.getMessage());
+            String oldPhotoId = personDTO.photoId();
+            if (oldPhotoId != null && !oldPhotoId.trim().isEmpty()) {
+                try {
+                    minioService.deleteFile(oldPhotoId);
+                } catch (Exception e) {
+                    System.out.println("Не удалось удалить старое фото: " + e.getMessage());
+                }
             }
+
+            String newPhotoId = minioService.uploadFile(file);
+            personService.updatePerson(new PersonDTO(
+                    personDTO.id(),
+                    personDTO.name(),
+                    personDTO.coordinates(),
+                    personDTO.eyeColor(),
+                    personDTO.hairColor(),
+                    personDTO.location(),
+                    personDTO.height(),
+                    personDTO.birthday(),
+                    personDTO.nationality(),
+                    personDTO.creationDate(),
+                    newPhotoId
+            ));
+
+            String photoUrl = minioService.getFileUrl(newPhotoId);
+            return new PhotoResponse("Фото успешно загружено", newPhotoId, photoUrl);
+        } catch (ServerException | InsufficientDataException | ErrorResponseException |
+                IOException | NoSuchAlgorithmException | InvalidKeyException |
+                InvalidResponseException | XmlParserException | InternalException e) {
+            throw new WorkWithPhotoException(e.getMessage());
         }
-
-        String newPhotoId = minioService.uploadFile(file);
-        personService.updatePerson(new PersonDTO(
-                personDTO.id(),
-                personDTO.name(),
-                personDTO.coordinates(),
-                personDTO.eyeColor(),
-                personDTO.hairColor(),
-                personDTO.location(),
-                personDTO.height(),
-                personDTO.birthday(),
-                personDTO.nationality(),
-                personDTO.creationDate(),
-                newPhotoId
-        ));
-
-        String photoUrl = minioService.getFileUrl(newPhotoId);
-        return new PhotoResponse("Фото успешно загружено", newPhotoId, photoUrl);
     }
 
     @Transactional
-    public PhotoResponse getPhoto(@PathVariable String photoId) throws ServerException,
-            InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
-        if (photoId == null || photoId.trim().isEmpty()) {
-            throw new ValidationException("PhotoId не указан");
-        }
-        if (!minioService.fileExists(photoId)) {
-            throw new NotFoundException("Фото не найдено");
-        }
+    public PhotoResponse getPhoto(@PathVariable String photoId) throws WorkWithPhotoException {
+        try {
+            if (photoId == null || photoId.trim().isEmpty()) {
+                throw new ValidationException("PhotoId не указан");
+            }
+            if (!minioService.fileExists(photoId)) {
+                throw new NotFoundException("Фото не найдено");
+            }
 
-        String photoUrl = minioService.getFileUrl(photoId);
-        return new PhotoResponse("Фото найдено", photoId, photoUrl);
+            String photoUrl = minioService.getFileUrl(photoId);
+            return new PhotoResponse("Фото найдено", photoId, photoUrl);
+        } catch (ServerException | InsufficientDataException | ErrorResponseException |
+                IOException | NoSuchAlgorithmException | InvalidKeyException |
+                InvalidResponseException | XmlParserException | InternalException e) {
+            throw new WorkWithPhotoException(e.getMessage());
+        }
     }
 
     @Transactional
-    public PhotoResponse deletePhoto(Long id) throws ServerException,
-            InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
+    public PhotoResponse deletePhoto(Long id)  {
 
         PersonDTO personDTO = personService.findPerson(id);
 
@@ -87,7 +93,7 @@ public class PhotoService {
             try {
                 minioService.deleteFile(oldPhotoId);
             } catch (Exception e) {
-                System.out.println("Не удалось удалить старое фото: " + e.getMessage());
+                log.error("Не удалось удалить старое фото: " + e.getMessage());
             }
         }
 

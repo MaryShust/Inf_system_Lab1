@@ -7,6 +7,7 @@ import io.minio.http.Method;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import infs.lab.config.AppConfig;
+
 @Slf4j
 @Service
 public class MinioService {
@@ -25,6 +28,9 @@ public class MinioService {
     private MinioClient minioClient;
     @Autowired
     private MinioConfig minioConfig;
+
+    @Autowired
+    private AppConfig appConfig;
 
     @PostConstruct
     public void init() {
@@ -64,7 +70,7 @@ public class MinioService {
 
         String contentType = file.getContentType();
         if (contentType == null) {
-            contentType = "application/octet-stream";
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
 
         try (InputStream inputStream = file.getInputStream()) {
@@ -93,10 +99,10 @@ public class MinioService {
 
         return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
-                        .method(Method.GET)
+                        .method(appConfig.getMethod())
                         .bucket(minioConfig.getBucketName())
                         .object(objectName)
-                        .expiry(7, TimeUnit.DAYS) // Срок действия ссылки
+                        .expiry(appConfig.getPresignedUrlExpiryDays(), appConfig.getPresignedUrlExpiryTimeUnit()) // Срок действия ссылки
                         .build()
         );
     }
@@ -152,10 +158,10 @@ public class MinioService {
 
         return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
-                        .method(Method.GET)
+                        .method(appConfig.getMethod())
                         .bucket(minioConfig.getBucketName())
                         .object(objectName)
-                        .expiry(7, TimeUnit.DAYS)
+                        .expiry(appConfig.getPresignedUrlExpiryDays(), appConfig.getPresignedUrlExpiryTimeUnit())
                         .extraQueryParams(Map.of(
                                 "response-content-disposition", responseContentDisposition
                         ))

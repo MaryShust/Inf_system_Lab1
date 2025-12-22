@@ -2,7 +2,12 @@ package infs.lab.controller.dto;
 
 import infs.lab.db.entities.History;
 import infs.lab.services.MinioService;
+import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 
 @Schema(description = "История")
@@ -25,7 +30,21 @@ public record HistoryDTO(
                         history.getFileObjectName(),
                         history.getOriginalFilename()
                 );
-            } catch (Exception ignored) {}
+            } catch (ServerException | InsufficientDataException |
+                    ErrorResponseException | IOException |
+                    NoSuchAlgorithmException | InvalidKeyException |
+                    InvalidResponseException | XmlParserException |
+                    InternalException ignored) {
+                {}
+            }
+        }
+
+        String formatFileSize;
+        Long fileSize = history.getFileSize();
+        if (fileSize == null) {
+            formatFileSize = "N/A";
+        } else {
+            formatFileSize = formatFileSize(fileSize);
         }
 
         return new HistoryDTO(
@@ -35,13 +54,12 @@ public record HistoryDTO(
                 history.getCountItems(),
                 history.getOriginalFilename(),
                 downloadUrl,
-                history.getFileSize(),
-                formatFileSize(history.getFileSize())
+                fileSize,
+                formatFileSize
         );
     }
 
-    private static String formatFileSize(Long bytes) {
-        if (bytes == null) return "N/A";
+    private static String formatFileSize(long bytes) {
         if (bytes <= 0) return "0 B";
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
